@@ -1,0 +1,75 @@
+{
+  "name": "react-router-hono-fullstack-template",
+  "description": "A modern full-stack template powered by Cloudflare Workers, using Hono for backend APIs, React Router for frontend routing, and shadcn/ui for beautiful, accessible components styled with Tailwind CSS",
+  "private": true,
+  "type": "module",
+  "cloudflare": {
+    "label": "React Router + Hono Fullstack App",
+    "products": [
+      "Workers"
+    ],
+    "categories": [
+      "starter"
+    ],
+    "docs_url": "https://developers.cloudflare.com/workers",
+    "preview_icon_url": "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/d3db20ee-c3bf-4b5c-f1ed-d86021359e00/public",
+    "preview_image_url": "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/56caa8a9-d3ab-4ac6-32a9-6a5fc686e000/preview",
+    "publish": true
+  },
+  "dependencies": {
+    "@clerk/clerk-react": "^5.58.1",
+    "@prisma/adapter-pg": "^7.1.0",
+    "@prisma/client": "^7.1.0",
+    "@t3-oss/env-core": "^0.13.8",
+    "@tailwindcss/vite": "^4.1.17",
+    "dotenv": "^17.2.3",
+    "hono": "^4.10.8",
+    "isbot": "5.1.26",
+    "lucide-react": "^0.477.0",
+    "pg": "^8.16.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router": "^7.9.0",
+    "tailwindcss": "^4.1.17",
+    "vite-tsconfig-paths": "^5.1.4",
+    "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.13.8",
+    "@cloudflare/workers-types": "^4.20250425.0",
+    "@react-router/dev": "^7.9.0",
+    "@types/node": "24.0.4",
+    "@types/pg": "^8.15.6",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.1.2",
+    "dotenv-cli": "^10.0.0",
+    "jsdom": "^27.0.0",
+    "prettier": "^3.5.3",
+    "prisma": "^7.1.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.8.3",
+    "vite": "^7.1.7",
+    "vitest": "^3.0.5",
+    "web-vitals": "^5.1.0",
+    "wrangler": "^4.40.3"
+  },
+  "scripts": {
+    "build": "react-router build",
+    "cf-typegen": "wrangler types",
+    "deploy": "npm run build && wrangler deploy",
+    "dev": "react-router dev",
+    "preview": "npm run build && vite preview",
+    "typecheck": "npm run cf-typegen && react-router typegen && tsc -b",
+    "test": "vitest run",
+    "lint": "eslint",
+    "format": "prettier",
+    "check": "prettier --write . && eslint --fix",
+    "post-cta-init": "npx create-db@latest",
+    "db:generate": "dotenv -e .env.local -- prisma generate",
+    "db:push": "dotenv -e .env.local -- prisma db push",
+    "db:migrate": "dotenv -e .env.local -- prisma migrate dev",
+    "db:studio": "dotenv -e .env.local -- prisma studio",
+    "db:seed": "dotenv -e .env.local -- prisma db seed"
+  }
+}
