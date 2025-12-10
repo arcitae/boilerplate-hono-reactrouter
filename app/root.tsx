@@ -6,9 +6,16 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import { ClerkProvider, SignedIn, SignedOut, UserButton, SignInButton, SignOutButton } from "@clerk/react-router";
+import { clerkMiddleware, rootAuthLoader } from "@clerk/react-router/server";
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { Header } from "./components/Header";
+
+export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
+
+export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args);
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -41,8 +48,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App() {
-  return <Outlet />;
+export default function App({ loaderData }: Route.ComponentProps) {
+  // Debug: Check if Clerk keys are set (only in dev)
+  if (import.meta.env.DEV) {
+    console.log("Clerk Publishable Key:", import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? "Set" : "Missing");
+    console.log("LoaderData:", loaderData);
+  }
+
+  return (
+    <ClerkProvider 
+      loaderData={loaderData}
+      publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+    >
+      <Header />
+      <main className="container mx-auto px-4 py-8">
+        <Outlet />
+      </main>
+    </ClerkProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

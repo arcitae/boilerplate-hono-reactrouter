@@ -1,49 +1,38 @@
-import logoDark from "./logo-dark.svg";
-import logoLight from "./logo-light.svg";
+// import logoDark from "./logo-dark.svg";
+// import logoLight from "./logo-light.svg";
+import HeaderUser from "./HeaderUser";
 
-export function Welcome({ message }: { message: string }) {
+export function Header({  }: {  }) {
   return (
-    <main className="flex items-center justify-center pt-16 pb-4">
-      <div className="flex-1 flex flex-col items-center gap-16 min-h-0">
-        <header className="flex flex-col items-center gap-9">
-          <div className="w-[500px] max-w-[100vw] p-4">
-            <img
-              src={logoLight}
-              alt="React Router"
-              className="block w-full dark:hidden"
-            />
-            <img
-              src={logoDark}
-              alt="React Router"
-              className="hidden w-full dark:block"
-            />
+    <header className="flex items-center justify-center py-8 px-4 border-b border-gray-200 dark:border-gray-800 min-h-[80px]">
+        {/* <SignedOut>
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400">You are signed out</p>
+            <SignInButton mode="modal">
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
+                Sign In
+              </button>
+            </SignInButton>
           </div>
-        </header>
-        {/* <div className="max-w-[300px] w-full space-y-6 px-4">
-          <nav className="rounded-3xl border border-gray-200 p-6 dark:border-gray-700 space-y-4">
-            <p className="leading-6 text-gray-700 dark:text-gray-200 text-center">
-              What&apos;s next?
-            </p>
-            <ul>
-              {resources.map(({ href, text, icon }) => (
-                <li key={href}>
-                  <a
-                    className="group flex items-center gap-3 self-stretch p-3 leading-normal text-blue-700 hover:underline dark:text-blue-500"
-                    href={href}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {icon}
-                    {text}
-                  </a>
-                </li>
-              ))}
-              <li className="self-stretch p-3 leading-normal">{message}</li>
-            </ul>
-          </nav>
-        </div> */}
-      </div>
-    </main>
+        </SignedOut>
+        <SignedIn>
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400">You are signed in</p>
+            <UserButton 
+            appearance={{
+              elements: {
+                avatarBox: "w-10 h-10",  // Size
+                userButtonPopoverCard: "shadow-lg"  // Styling
+              }
+            }}
+            />
+
+            <SignOutButton />
+          </div>
+        </SignedIn> */}
+
+        <HeaderUser />
+      </header>
   );
 }
 

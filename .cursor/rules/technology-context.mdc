@@ -1,0 +1,426 @@
+---
+alwaysApply: true
+---
+
+# Panya Technology Stack
+
+## Overview
+Technology stack and architecture decisions for Panya MVP. All code must be written in **TypeScript only**.
+
+---
+
+## Frontend Stack
+
+### Framework
+- **React Router** ([reactrouter.com](https://reactrouter.com))
+  - Production-ready, stable React framework for web applications
+  - Used for: Frontend UI + Server-Side Rendering (when required)
+  - Type-safe routing with file-based routing
+  - Supports Cloudflare Workers deployment
+  - Built on Vite
+
+### Build Tool
+- **Vite** - Build tool and dev server
+  - Used by React Router internally
+  - Fast HMR and optimized production builds
+
+### Authentication (Frontend)
+- **Clerk** ([clerk.com](https://clerk.com))
+  - SDK: `@clerk/react-router`
+  - Handles: User sign-up, sign-in, session management on frontend
+  - Supports: Email+Password, Email OTP, Google OAuth, Facebook OAuth
+  - Integration: [Clerk React Router Quickstart](https://clerk.com/docs/react-router/getting-started/quickstart)
+
+### Analytics (Frontend)
+- **PostHog** ([posthog.com](https://posthog.com))
+  - SDK: `posthog-js` + `@posthog/react`
+  - Handles: User analytics, custom events, session recordings, feature flags
+  - Integration: [PostHog React Integration](https://posthog.com/docs/libraries/react)
+  - Provider wraps app root for analytics tracking
+
+### API Client (Frontend)
+- **Hono Client (`hc`)** ([hono.dev/docs/concepts/stacks](https://hono.dev/docs/concepts/stacks))
+  - Type-safe HTTP client for Hono APIs
+  - Provides full type inference from backend API routes
+  - Used in React Router loaders/actions for API calls
+  - Package: `hono/client`
+  - Pattern: Export `AppType` from Hono server, use `hc<AppType>` on client
+  - Integrates seamlessly with Zod validators for end-to-end type safety
+
+### Language
+- **TypeScript** - All code must be TypeScript (no JavaScript)
+
+---
+
+## Backend Stack
+
+### Framework
+- **Hono** ([hono.dev](https://hono.dev))
+  - Ultrafast web framework built on Web Standards
+  - Used for: All API endpoints and backend logic
+  - Supports: WebSocket (for real-time audio/video streaming)
+  - Multi-runtime: Works on Cloudflare Workers, Node.js, etc.
+  - TypeScript-first with excellent type inference
+
+### Authentication (Backend)
+- **Clerk Backend SDK**
+  - Token verification via Hono middleware
+  - Protects all API routes
+  - Validates JWT tokens from frontend
+
+### API Documentation
+- **Hono OpenAPI** ([hono.dev/examples/hono-openapi](https://hono.dev/examples/hono-openapi))
+  - Automatic OpenAPI documentation generation
+  - Integrates with Zod for schema validation
+  - Package: `hono-openapi` + `@hono/standard-validator`
+  
+- **Swagger UI** ([hono.dev/examples/swagger-ui](https://hono.dev/examples/swagger-ui))
+  - Interactive API documentation UI
+  - Package: `@hono/swagger-ui`
+  - Served at `/ui` endpoint, OpenAPI spec at `/openapi`
+
+### Request Validation
+- **Zod Validator** ([github.com/honojs/middleware/tree/main/packages/zod-validator](https://github.com/honojs/middleware/tree/main/packages/zod-validator))
+  - Type-safe request validation using Zod schemas
+  - Validates query params, request body, path params
+  - Integrates with Hono OpenAPI for automatic documentation
+  - Package: `@hono/zod-validator` + `zod`
+
+### Monitoring & Observability
+- **OpenTelemetry** ([github.com/honojs/middleware/tree/main/packages/otel](https://github.com/honojs/middleware/tree/main/packages/otel))
+  - Distributed tracing and monitoring
+  - Package: `@hono/otel`
+  - Tracks request traces across services
+  - Integrates with observability platforms
+
+- **Logger Middleware** ([hono.dev/docs/middleware/builtin/logger](https://hono.dev/docs/middleware/builtin/logger))
+  - Built-in Hono logger middleware
+  - Logs HTTP requests with method, path, status, response time
+  - Package: Built into `hono` (no additional package needed)
+
+- **Request ID Middleware** ([hono.dev/docs/middleware/builtin/request-id](https://hono.dev/docs/middleware/builtin/request-id))
+  - Generates unique request ID for each request
+  - Helps with request tracing and debugging
+  - Package: Built into `hono` (no additional package needed)
+
+### Analytics (Backend)
+- **PostHog** ([posthog.com/docs/libraries/hono](https://posthog.com/docs/libraries/hono))
+  - Server-side analytics and event tracking
+  - Package: `posthog-node`
+  - Captures API events, errors, and custom metrics
+  - Middleware integration for automatic event capture
+
+### Database & ORM
+- **Prisma** ([prisma.io](https://www.prisma.io/orm))
+  - ORM for database operations
+  - Type-safe database client
+  - Migration management
+  - Integration: [Prisma with Hono Guide](https://www.prisma.io/docs/guides/hono)
+  - Initialized in Hono server only (not in React Router frontend)
+
+### Database
+- **PostgreSQL**
+  - Initial: Prisma-hosted PostgreSQL service ([prisma.io/postgres](https://www.prisma.io/postgres))
+  - Future: Migrate to self-hosted PostgreSQL
+  - All database operations through Prisma ORM
+
+### Database Migrations
+- **Strategy**: Run migrations on Hono server startup
+- **Implementation**: Check if migrations are pending, run automatically
+- **Location**: Migration files in codebase (Prisma schema + migrations)
+- **Deployment**: Migrations execute automatically when server starts
+
+---
+
+## AI & Media Services
+
+### Current Services (to be integrated)
+- **OpenAI** - LLM for conversation generation
+- **Deepgram** - Speech-to-Text (STT) for user audio
+- **Google Cloud Text-to-Speech** - TTS for AI responses
+- **HeyGen** - AI avatar video generation
+- **LiveKit** (client-side) - Real-time communication
+
+---
+
+## Project Structure
+
+```
+panya-app/
+├── app/
+│   ├── frontend/          # React Router application
+│   │   ├── routes/        # React Router routes
+│   │   ├── components/    # React components
+│   │   ├── hooks/         # Custom React hooks
+│   │   ├── lib/           # Frontend utilities
+│   │   ├── root.tsx       # Root layout component
+│   │   └── entry.server.tsx  # Server entry point
+│   │
+│   └── backend/           # Hono API server
+│       ├── routes/        # Hono API routes
+│       ├── middleware/    # Auth, CORS, logger, request-id, etc.
+│       ├── services/      # Business logic
+│       ├── schemas/       # Zod validation schemas
+│       ├── lib/           # Backend utilities (Prisma client, etc.)
+│       └── index.ts       # Hono app entry point (exports AppType)
+│
+├── prisma/                # Prisma configuration
+│   ├── schema.prisma      # Database schema
+│   ├── migrations/        # Database migrations
+│   └── seed.ts            # Database seed script
+│
+├── workers/               # Cloudflare Workers entry points
+│   └── app.ts             # Main worker entry (integrates frontend + backend)
+│
+├── public/                # Static assets
+├── package.json           # Root package.json (monorepo)
+├── vite.config.ts         # Vite configuration
+├── react-router.config.ts # React Router configuration
+└── wrangler.jsonc         # Cloudflare Workers configuration
+```
+
+---
+
+## Architecture Pattern
+
+### Data Flow
+1. **Frontend (React Router)**
+   - User interacts with UI
+   - React Router loaders/actions fetch data from Hono API
+   - Loaders/actions use `hc<AppType>` client for type-safe API calls
+   - `hc` client calls Hono API endpoints with full type inference
+   - Data is passed to React components via loader data
+
+2. **Backend (Hono)**
+   - Receives requests from React Router loaders/actions (via `hc` client)
+   - Request ID middleware generates unique ID for tracing
+   - Logger middleware logs all requests
+   - OpenTelemetry middleware tracks distributed traces
+   - Clerk middleware verifies authentication tokens
+   - Zod validator validates request data
+   - Prisma handles all database operations
+   - PostHog captures analytics events
+   - Returns typed data to React Router loaders/actions
+
+3. **Real-time (WebSocket)**
+   - Hono WebSocket server handles audio streaming
+   - Integrates with Deepgram for STT
+   - Streams AI avatar video/audio back to client
+
+### Authentication Flow
+1. User authenticates via Clerk on frontend (React Router)
+2. Clerk provides JWT token
+3. React Router loaders/actions include token in requests to Hono (via `hc` client)
+4. Hono middleware verifies token with Clerk Backend SDK
+5. Protected routes access user context
+
+### RPC Pattern (Type-Safe API Calls)
+1. **Hono Server**: Export `AppType` from route definitions
+   ```typescript
+   const app = new Hono()
+   app.get('/api/users', ...)
+   export type AppType = typeof app
+   ```
+2. **React Router Loaders/Actions**: Import `AppType` and create typed client
+   ```typescript
+   import { AppType } from '../../app/backend/index'
+   import { hc } from 'hono/client'
+   
+   const client = hc<AppType>(process.env.API_URL)
+   const res = await client.api.users.$get()
+   const data = await res.json() // Fully typed!
+   ```
+3. **Benefits**: 
+   - Full type inference from backend to frontend
+   - Auto-completion for API paths and parameters
+   - Compile-time type checking
+   - Shared types between server and client
+
+### Database Access Pattern
+- **All database operations**: Hono server only
+- **Prisma Client**: Initialized once in Hono server (using PrismaPg adapter)
+- **No direct database access**: From React Router frontend (always goes through Hono API via `hc` client)
+- **Prisma Middleware**: Use Hono middleware pattern to inject Prisma client into context
+
+---
+
+## Deployment
+
+### Target Platform
+- **Cloudflare Workers**
+  - Full-stack: React Router + Hono deployed as single Cloudflare Worker
+  - Hono handles API routes (`/api/*`)
+  - React Router handles all other routes (frontend)
+  - Both integrated in `workers/app.ts` entry point
+
+### Migration Strategy
+- Migrations run automatically on Hono server startup
+- Check for pending migrations before server accepts requests
+- Fail fast if migrations fail (don't start server)
+
+---
+
+## Key Architectural Decisions
+
+### ✅ What Goes Where
+
+**React Router (Frontend - `app/frontend/`)**
+- UI components and pages
+- Client-side state management
+- Route loaders/actions for data fetching (calls Hono API)
+- `hc` client for type-safe API calls to Hono backend
+- Clerk authentication UI
+- Real-time video/audio display (client-side)
+
+**Hono (Backend - `app/backend/`)**
+- All API endpoints (prefixed with `/api/*`)
+- All database operations (via Prisma)
+- Clerk token verification middleware
+- Request validation with Zod
+- API documentation (OpenAPI + Swagger UI)
+- Request logging and tracing (Logger + Request ID + OpenTelemetry)
+- Analytics tracking (PostHog)
+- WebSocket server for real-time audio streaming
+- Integration with AI services (OpenAI, Deepgram, Google TTS, HeyGen)
+- Business logic and data processing
+
+### ❌ Anti-Patterns to Avoid
+
+- ❌ Don't expose Hono API endpoints directly to client (use loaders/actions)
+- ❌ Don't initialize Prisma in React Router frontend
+- ❌ Don't put business logic in React Router loaders/actions (keep them thin, delegate to Hono)
+- ❌ Don't access database directly from frontend
+- ❌ Don't skip migration checks on server startup
+
+---
+
+## Development Workflow
+
+### Setup
+1. **Root**: `npm install` (installs all dependencies)
+2. **Database**: Configure Prisma with PostgreSQL connection
+3. **Environment**: Set up `.env.local` file with `DATABASE_URL` and other env vars
+
+### Development
+- **Full-stack**: `npm run dev` (React Router dev server with Hono API integrated)
+- **Database**: `npm run db:studio` (Prisma Studio for database inspection)
+
+### Database Changes
+1. Update `prisma/schema.prisma`
+2. Create migration: `npm run db:migrate` (or `npx prisma migrate dev --name migration_name`)
+3. Migration files committed to codebase
+4. Generate Prisma Client: `npm run db:generate`
+5. On deployment: Migrations run automatically on server startup
+
+---
+
+## Dependencies Summary
+
+### Frontend (React Router)
+```json
+{
+  "react-router": "^7.x",
+  "@clerk/react-router": "latest",
+  "posthog-js": "latest",
+  "@posthog/react": "latest",
+  "hono": "latest",
+  "react": "^19.x",
+  "react-dom": "^19.x",
+  "typescript": "^5.x"
+}
+```
+
+**Note**: `hono` package includes `hono/client` for the `hc` RPC client. Install `hono` in the frontend to use `hc<AppType>`.
+
+### Backend (Hono)
+```json
+{
+  "hono": "latest",
+  "@clerk/backend": "latest",
+  "@prisma/client": "latest",
+  "@prisma/adapter-pg": "latest",
+  "prisma": "latest (dev)",
+  "pg": "latest",
+  "hono-openapi": "latest",
+  "@hono/standard-validator": "latest",
+  "@hono/swagger-ui": "latest",
+  "@hono/zod-validator": "latest",
+  "zod": "latest",
+  "@hono/otel": "latest",
+  "posthog-node": "latest",
+  "openai": "latest",
+  "@deepgram/sdk": "latest",
+  "@google-cloud/text-to-speech": "latest",
+  "dotenv": "latest"
+}
+```
+
+**Note**: For Cloudflare Workers, use `@prisma/adapter-d1` instead of `@prisma/adapter-pg` if using D1 database.
+
+---
+
+## Migration from Previous Stack
+
+### Previous → Current
+
+**Frontend**
+- ❌ TanStack Start → ✅ React Router (stable, production-ready)
+- ❌ `@clerk/tanstack-react-start` → ✅ `@clerk/react-router`
+- ✅ TypeScript (keep)
+- ✅ Vite (keep)
+
+**Backend**
+- ✅ Hono (keep)
+- ✅ Prisma + PostgreSQL (keep)
+- ✅ TypeScript (keep)
+- ✅ WebSocket (keep)
+
+**Database**
+- ✅ PostgreSQL (Prisma-hosted initially)
+
+---
+
+## Middleware Order (Hono)
+
+**Critical**: Middleware order matters. Apply in this order:
+
+1. **Request ID** - Generate unique ID first
+2. **Logger** - Log all requests
+3. **OpenTelemetry** - Start tracing
+4. **CORS** - Handle cross-origin requests
+5. **Clerk Auth** - Verify authentication (for protected routes)
+6. **Zod Validator** - Validate request data
+7. **Route Handler** - Execute business logic
+8. **PostHog** - Capture events (in middleware or route handler)
+
+## API Documentation
+
+- **OpenAPI Spec**: Available at `/openapi` endpoint
+- **Swagger UI**: Available at `/ui` endpoint
+- **Auto-generation**: All routes with Zod validation automatically documented
+- **Manual docs**: Use `describeRoute()` for additional documentation
+
+## Monitoring & Logging
+
+- **Request ID**: Every request gets unique ID for tracing
+- **Logger**: All requests logged with method, path, status, duration
+- **OpenTelemetry**: Distributed tracing across services
+- **PostHog**: Analytics events and error tracking
+- **Error Tracking**: PostHog captures exceptions via `app.onError`
+
+## Notes
+
+- All code must be TypeScript (no `.js` or `.jsx` files)
+- React Router handles routing, SSR, and data loading
+- Hono is the single source of truth for all backend logic
+- **RPC Pattern**: Hono server must export `AppType` for type-safe client calls
+- **Type-Safe API Calls**: Use `hc<AppType>` in React Router loaders/actions
+- Clerk handles auth on both frontend and backend
+- Prisma migrations are code-based and run on server startup
+- Cloudflare Workers deployment: Single worker with integrated frontend + backend
+- All API endpoints must have Zod validation schemas
+- API documentation is automatically generated from Zod schemas
+- Request ID and logging are applied to all routes
+- For RPC to work correctly, all route methods must be chained and `AppType` inferred from the Hono app instance
+- **Project Structure**: Clear separation with `app/frontend/` and `app/backend/` folders
+- **Prisma Integration**: Follow [Prisma with Hono guide](https://www.prisma.io/docs/guides/hono) for proper setup

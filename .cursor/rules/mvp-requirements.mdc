@@ -1,0 +1,298 @@
+---
+alwaysApply: true
+---
+
+# Panya MVP Requirements
+
+## Overview
+Minimum viable product requirements for Panya language learning platform. Focus: Core functionality to enable parent-child onboarding and AI Tutor video sessions.
+
+---
+
+## 1. Authentication
+
+### Requirements
+
+#### Parent Sign Up
+**Available Methods:**
+- Email + Password
+- Google OAuth
+- Facebook OAuth
+- Email OTP (One-Time Password via email)
+
+**Sign Up Flow:**
+- User selects preferred sign-up method
+- For Email + Password: Email verification (optional for MVP)
+- For OAuth (Google/Facebook): Account linking
+- For Email OTP: OTP sent to email, user enters code
+- Password creation required for Email + Password method
+- Account created after successful authentication
+
+#### Parent Sign In
+**Available Methods:**
+- Email + Password
+- Email OTP (One-Time Password via email)
+- Google OAuth
+- Facebook OAuth
+
+**Features:**
+- "Remember me" functionality
+- Password reset flow (for Email + Password)
+- OTP resend option (for Email OTP)
+- Multiple login methods can be linked to same account
+
+#### Child Sign In
+**Available Methods:**
+- Email + Password (if child has email)
+- Password only (always available, even without email)
+- Alternative: Parent-assisted login (parent selects child from their account)
+
+**Requirements:**
+- Password is always created during child profile setup (mandatory)
+- If child has email: Can use Email + Password or Password only
+- If child doesn't have email: Can use Password only (username/identifier provided by parent)
+- No separate sign-up flow for children (created by parent)
+- No OAuth or OTP for children (password-based only)
+
+#### Session Management
+- Maintain authenticated session
+- Logout functionality
+- Session timeout handling
+- Support for multiple concurrent sessions (if needed)
+
+---
+
+## 2. Profile Management
+
+### Parent Profile
+**Required Fields:**
+- Name (first, last)
+- Email (used as User ID) - required for Email + Password and Email OTP methods
+- Phone number (optional for MVP)
+- Password (required if using Email + Password method; optional if using OAuth only)
+
+**Actions:**
+- View own profile
+- Edit profile information
+- Change password (if using Email + Password)
+- Link/unlink OAuth accounts (Google, Facebook)
+- Manage authentication methods
+
+### Child Profile
+**Required Fields:**
+- Name (first, last)
+- Age
+- Gender
+- Password (always required - mandatory for login)
+- Username/Login identifier (if no email provided)
+- Email (optional - if provided, enables Email + Password login)
+- Current spoken language (e.g., English)
+- Target language (e.g., Hindi, Kannada, Marathi)
+- Interest areas (tags/categories - e.g., "sports", "music", "animals")
+
+**Login Credentials:**
+- Password is always created during profile setup (mandatory)
+- If email provided: Child can login with Email + Password or Password only
+- If no email: Child can login with Username/Identifier + Password
+- Parent sets up login credentials during child profile creation
+
+**Actions:**
+- Parent creates child profile (including password setup)
+- Parent edits child profile
+- Parent views child profile
+- Parent can reset child password
+- Child views own profile (read-only)
+
+---
+
+## 3. Family Management
+
+### Family Structure
+- One parent account can have multiple children (1:N relationship)
+- Maximum 2 parents per child (optional for MVP - start with 1 parent)
+- Each child has independent profile and progress
+
+### Parent Capabilities
+- **Add Child**
+  - Create new child profile
+  - Fill required fields
+  - Set target language and interests
+  
+- **View Children List**
+  - See all children associated with account
+  - Quick access to each child's dashboard
+  
+- **Switch Between Children**
+  - Select which child to manage/view
+  - Context switches to selected child
+  
+- **Remove Child** (optional for MVP)
+  - Delete child profile
+  - Handle data deletion compliance
+
+### Data Consent
+- Parent must provide consent for child data collection
+- Consent checkbox during child profile creation
+- Brief explanation of data usage
+- Option to revoke consent (triggers data deletion)
+
+---
+
+## 4. AI Tutor Video Call
+
+### Video Call Interface
+**Layout:**
+- Zoom-like interface
+- AI Tutor avatar displayed prominently (main video)
+- User's own video displayed in small PIP (picture-in-picture) - **shown to user only, NOT sent to server**
+- Controls at bottom (mic, video toggle, end call)
+
+**Video/Audio Flow:**
+- **User → Server**: Audio only (user speech)
+- **Server → User**: Video (AI avatar) + Audio (AI tutor speech)
+- User video is local-only (for user's self-view, not transmitted)
+
+### Session Initiation
+- Child selects "Start Tutor Session" from dashboard
+- System validates:
+  - Child has active subscription
+  - Minutes available
+  - Child profile is complete
+- Connects to AI Tutor service
+- Establishes WebSocket/real-time connection
+
+### During Session
+**Real-time Features:**
+- **Speech-to-Text**: User audio → text (sent to AI)
+- **AI Response Generation**: LLM processes conversation
+- **Text-to-Speech**: AI response → audio
+- **Avatar Video**: AI avatar speaks (lip-sync with audio)
+- **Subtitles/Overlays**: Display AI speech as text (optional overlay)
+
+**Controls:**
+- Mute/unmute microphone
+- Toggle video (user's self-view)
+- End session button
+- Session timer display
+
+**Session State:**
+- Track session start time
+- Track session duration
+- Track minutes consumed
+- Handle connection drops/reconnects
+
+### Session Completion
+- User ends session or session times out
+- Calculate minutes used
+- Update child's remaining minutes
+- Save session summary (duration, date, topic covered)
+- Return to dashboard
+
+### Error Handling
+- Connection failures
+- Audio/video permission denials
+- Subscription expired
+- Minutes exhausted
+- Network interruptions
+
+---
+
+## MVP Scope Boundaries
+
+### Included in MVP
+✅ Authentication (parent + child login)
+✅ Profile management (parent + child)
+✅ Family management (add/view children)
+✅ AI Tutor video call (basic session)
+✅ Session tracking (duration, minutes)
+
+### Excluded from MVP
+❌ Subscription/payment integration
+❌ Companion module
+❌ Community module
+❌ Assignment submission
+❌ Progress dashboard (detailed)
+❌ Parent notifications
+❌ Referral system
+❌ Points/rewards system
+❌ Multiple language support (focus on one target language)
+
+---
+
+## User Flows
+
+### Flow 1: Parent Onboarding
+1. Parent selects sign-up method:
+   - Email + Password
+   - Email OTP
+   - Google OAuth
+   - Facebook OAuth
+2. Complete authentication (varies by method)
+3. Parent creates profile (name, email, phone)
+4. Parent adds child profile:
+   - Name, age, gender, target language, interests
+   - **Always creates password for child** (mandatory)
+   - Optionally adds email for child
+5. Parent provides data consent
+6. Parent completes onboarding → redirected to dashboard
+
+### Flow 2: Child Session
+1. **Login Options:**
+   - Parent logs in (Email+Password, Email OTP, Google, or Facebook)
+   - OR Child logs in:
+     - Email + Password (if child has email)
+     - OR Password only (username/identifier + password)
+2. Select child (if parent) OR auto-select (if child)
+3. View child dashboard
+4. Click "Start Tutor Session"
+5. Join video call with AI Tutor
+6. Have conversation session
+7. End session
+8. Return to dashboard (see session summary)
+
+### Flow 3: Session Management
+1. User starts session
+2. System checks subscription/minutes
+3. Connects to AI Tutor
+4. Real-time conversation (audio → AI → video+audio)
+5. User ends session
+6. System saves session data
+7. Updates minutes remaining
+
+---
+
+## Technical Constraints
+
+### Video Call Architecture
+- **User Video**: Local rendering only (not sent to server)
+- **User Audio**: Sent to server for STT processing
+- **Server Response**: Video stream (avatar) + Audio stream (TTS)
+- **Connection**: WebSocket or similar real-time protocol
+- **Latency**: Must be low (< 2 seconds for response)
+
+### Data Requirements
+- User authentication state
+- Parent and child profiles
+- Family relationships (parent ↔ children)
+- Session history (date, duration, minutes used)
+- Subscription status (active/inactive, minutes remaining)
+
+---
+
+## Success Criteria
+
+### MVP is Complete When:
+1. ✅ Parent can sign up and create account
+2. ✅ Parent can add child profile with all required fields
+3. ✅ Parent/child can log in
+4. ✅ Child can initiate AI Tutor video session
+5. ✅ Video call works: user sees AI avatar, user audio is processed
+6. ✅ Session can be ended and duration is tracked
+7. ✅ Basic session history is saved
+
+### Quality Requirements:
+- Authentication is secure
+- Video call latency is acceptable (< 2s)
+- Audio quality is clear
+- Interface is intuitive for ages 6-12
+- No critical bugs in core flows

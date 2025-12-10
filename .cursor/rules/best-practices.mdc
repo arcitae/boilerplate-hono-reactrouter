@@ -1,0 +1,109 @@
+---
+alwaysApply: true
+---
+
+# Panya Development Best Practices
+
+## Core Principles
+
+### 1. Ask for Clarification
+- **Never assume** - If requirements are unclear or ambiguous, ask for clarification
+- **Don't be a yes man** - Challenge assumptions and propose better solutions
+- **Avoid ambiguous implementations** - If something is unclear, discuss before coding
+- **Confirm edge cases** - Ask about error handling, validation, and boundary conditions
+
+### 2. Documentation & Comments
+- **Backend API Documentation**: Use Hono OpenAPI with `describeRoute()` for all endpoints
+- **Code Comments**: Add JSDoc comments for complex logic, functions, and business rules
+- **Type Documentation**: Document complex types and interfaces
+- **Inline Comments**: Explain "why" not "what" - focus on business logic and decisions
+- **API Examples**: Include request/response examples in OpenAPI documentation
+
+### 3. Type Safety
+- **TypeScript Only**: All code must be TypeScript (no `.js` or `.jsx` files)
+- **Strict Mode**: Use TypeScript strict mode
+- **Zod Validation**: All API endpoints must validate requests with Zod schemas
+- **Type Inference**: Leverage TypeScript inference, avoid explicit types when unnecessary
+- **RPC Types**: Use `hc<AppType>` for type-safe API calls between frontend and backend
+- **Prisma Types**: Use generated Prisma types, avoid manual type definitions
+
+### 4. Feature Development Workflow
+- **One Feature at a Time**: Complete one feature fully before starting another
+- **Feature Summary**: At task completion, create a summary including:
+  - What was implemented
+  - Important decisions made
+  - Trade-offs considered
+  - Known limitations or future improvements
+  - Testing approach
+- **Incremental Commits**: Commit logical units of work with clear messages
+
+---
+
+## Code Quality Standards
+
+### Backend (Hono)
+- **Zod Validation**: Every endpoint must validate input with Zod
+- **Error Handling**: Use Hono's error handling patterns, return appropriate HTTP status codes
+- **Middleware Order**: Follow documented middleware order (Request ID → Logger → OpenTelemetry → CORS → Auth → Validator)
+- **OpenAPI Documentation**: All routes must be documented with `describeRoute()`
+- **Type Export**: Export `AppType` from main server file for RPC client
+
+### Frontend (TanStack Start)
+- **Server Functions**: Use Server Functions for all API calls (never expose API endpoints to client)
+- **Type-Safe Calls**: Always use `hc<AppType>` client for API calls
+- **Component Structure**: Keep components focused and reusable
+- **Error Boundaries**: Implement error boundaries for graceful error handling
+
+### Database (Prisma)
+- **Migrations**: All schema changes must go through Prisma migrations
+- **Type Safety**: Use Prisma generated types, never manually define database types
+- **Relations**: Define relationships in Prisma schema, not in application code
+- **Queries**: Use Prisma's type-safe query builder, avoid raw SQL unless necessary
+
+---
+
+## Security Practices
+
+- **Authentication**: Always verify Clerk tokens in Hono middleware for protected routes
+- **Input Validation**: Validate and sanitize all user inputs with Zod
+- **Error Messages**: Never expose sensitive information in error messages
+- **Environment Variables**: Use environment variables for all secrets and configuration
+- **CORS**: Configure CORS properly for production environments
+
+---
+
+## Testing & Quality
+
+- **Type Checking**: Ensure TypeScript compiles without errors before committing
+- **Linting**: Fix all linting errors before completing a feature
+- **Manual Testing**: Test features manually in development before marking complete
+- **Edge Cases**: Consider and handle edge cases (empty inputs, null values, network errors)
+
+---
+
+## Git & Version Control
+
+- **Commit Messages**: Write clear, descriptive commit messages
+- **Branch Strategy**: Use feature branches for new features
+- **Code Review**: Review your own code before requesting review
+- **Atomic Commits**: Each commit should represent a single logical change
+
+---
+
+## Performance
+
+- **Database Queries**: Optimize Prisma queries, use `select` to fetch only needed fields
+- **API Responses**: Return only necessary data, avoid over-fetching
+- **Caching**: Consider caching for frequently accessed data
+- **Bundle Size**: Monitor and optimize frontend bundle size
+
+---
+
+## Reminders
+
+- ✅ Always ask if unsure
+- ✅ Document as you code
+- ✅ Type everything
+- ✅ One feature, one summary
+- ✅ Test before completing
+- ✅ Follow the architecture patterns defined in technology-context.mdc

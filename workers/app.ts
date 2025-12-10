@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { createRequestHandler } from "react-router";
+import { createRequestHandler, RouterContextProvider } from "react-router";
 
 const app = new Hono();
 
@@ -12,8 +12,12 @@ app.get("*", (c) => {
   );
 
   return requestHandler(c.req.raw, {
-    cloudflare: { env: c.env, ctx: c.executionCtx },
-  });
+    getLoadContext() {
+      // Return RouterContextProvider for middleware support
+      // Cloudflare context can be added later if needed
+      return new RouterContextProvider();
+    },
+  } as any);
 });
 
 export default app;

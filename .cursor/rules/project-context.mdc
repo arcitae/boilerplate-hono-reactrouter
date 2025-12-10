@@ -1,0 +1,490 @@
+# Panya - Project Context & MVP Requirements
+
+## Project Overview
+
+**Panya** is a GenAI-powered language learning platform that emulates human tutor + classroom experience. The initial focus is on South Asian diaspora children (ages 6-12) in US/Canada learning native languages (Hindi, Kannada, Marathi, etc.).
+
+### Key Metrics & Goals
+- **System use time**: 30+ mins/day
+- **Retention**: 90%+ (MVP: 80 users retained from 100 signups)
+- **Referral**: 40%+ (MVP: 20 users)
+- **Upsell**: 30%+
+- **MVP CAC**: $0
+
+### Commercial Model
+- Subscription per child: $25/month
+- 600 tutor minutes/month + 500 companion minutes/month
+- Monthly and annual plans ($250/year = 2 months free)
+
+---
+
+## MVP Goals
+
+1. **Sign up**: 100 paying users
+2. **Retain**: 80 users
+3. **Referral**: 20 users
+4. **CAC**: $0
+
+---
+
+## User Types
+
+### Parents (Payers)
+- 2 allowed per child
+- **Capabilities**:
+  - Setup account: profile for themselves and child (Name, gender, age, email, phone, current language)
+  - Give consent for data collection
+  - Set up subscription: credit card, payment mandate (monthly/yearly)
+  - Monitor: Login to see lesson progress, time spent, notes from Tutor
+  - Receive updates (email/WhatsApp): Summary updates, notes from Tutor, notifications for missed sessions
+  - Referrals: Gift a free month to a friend (get a free month too)
+  - Request deletion of account and past data
+
+### Children (Primary Users)
+- Ages 6-12, low attention span
+- **Capabilities**:
+  - Access all three key modules: Tutor, Companion, Community
+  - Submit assignments (voice recordings)
+  - Access assignments and scores of all students in the class
+  - Minimum 30+ mins/day usage (split evenly between Tutor and Companion)
+
+---
+
+## Core Modules & Functionality
+
+### 1. Tutor Module
+**Purpose**: Emulates a teacher who is competent, happy, and supportive
+
+**Interface**:
+- Video (Avatar) & Audio interface like Zoom
+- Video minimizes when text is added
+- High accuracy and low latency for human-like conversation
+
+**Functionality**:
+- Understands needs, preferences, and proficiency of user
+- Runs lessons, practice sessions, assignments
+- Gives feedback to user
+- Lessons cover: grammar, pronunciation, idioms (follows curriculum)
+- Content personalized for user's interest areas
+- Weak areas come up repeatedly for practice
+- Assessment: Brief evaluation of child's capability in target language
+- Assignment review: Discusses performance and placement relative to class
+
+**First Session Flow**:
+1. Introduction: AI avatar introduces itself (name, location)
+2. Asks about child's interest areas
+3. Explains system: daily 30-min session (15 min tutor + 15 min companion)
+4. Commitment: Asks for fixed daily time, confirms schedule
+5. Assessment: Brief conversation/reading to determine level
+6. Lesson: Runs lesson appropriate to child's level
+7. Assignment: Requests 2-minute recording for practice
+8. Handover: Introduces Culture Companion
+
+**Subsequent Sessions**:
+- Starts with assignment performance review
+- Discusses placement relative to class
+- Encourages student
+- If session missed: "I've missed our sessions"
+
+### 2. Companion Module
+**Purpose**: Emulates a friend from target culture, excited about introducing user to culture
+
+**Interface**:
+- Video (Avatar) & Audio interface like Zoom
+- Lots of images and videos (call video minimizes to side)
+- Subtitles at bottom when companion speaks
+- Suggestions on side when user needs to speak (fade away as user improves)
+- Entire conversation in target language
+
+**Functionality**:
+- Helps user understand culture: stories, beliefs, customs, festivals, food, music, movies
+- Engages in conversation (asks questions, asks for opinions)
+- Pulls relevant material from YouTube
+- First session: Heavy on media (movie/song clips, sing/speak along)
+- Builds upon student's responses about interests
+
+### 3. Community Module
+**Purpose**: Emulates classroom experience - discussion, social connections, competition
+
+**Components**:
+1. **Text-based discussion area** (like Reddit)
+   - Users can start discussions and comment
+   - Mix of human and AI users (class size 15-20)
+   - AI users solve cold start problem (3-5 updates daily)
+   - Consistent AI user performance across discussions
+
+2. **Scoreboard area**
+   - Shows assignment scores of all users
+   - Assignments submitted as voice recordings
+   - Graded and uploaded to scoreboard
+   - Any user can access scores and assignments of all users
+   - AI users perform better than human users
+
+---
+
+## User Journey & Screens
+
+### Sign Up Flow
+
+**Screen 1: Landing/Deep Link Page**
+- Content appropriate to target language and current language
+- Example: "Create an account to start learning Hindi"
+- Multiple login options: Google, Facebook, Email
+
+**Screen 2: Activation/Onboarding**
+- Short clip showing key benefits and features
+- Paywall with options:
+  - Monthly: $25
+  - Annual: $250 (2 months free)
+- Grey cancel button (if clicked → prompt for 3-day free trial with credit card)
+
+**Screen 3: Parent Profile Setup**
+- Conversational interface: "Awesome to have you onboard! Let's get to know a little better!"
+- Collect: Name, age, Gender, email, phone number
+- Optionally add second parent details
+- Email becomes User ID, create password
+
+**Screen 4: Child Profile Setup**
+- Add child details: Name, Age, Gender, Email (optional), Phone (optional), current spoken language, Interest areas
+- Child can create login (email as User ID, password)
+- Parent gives consent for data collection
+- Informed: Can delete data anytime but will hamper personalization
+
+**Screen 5: First Session Invitation**
+- Parent invited to do first session together with child (using child's login)
+
+### First Session Flow
+
+**Screen 6: Tutor Introduction**
+- AI avatar appears
+- Introduces itself (name, location)
+- Asks about interest areas
+- Explains system and modules
+
+**Screen 7: Commitment Setup**
+- Tutor asks for fixed daily time
+- Confirms schedule
+- Informs about daily attendance and weekly performance updates
+
+**Screen 8: Assessment**
+- Conversation or reading aloud
+- Determines proficiency level
+- Announces level and first lesson topic
+
+**Screen 9: Lesson**
+- Lesson appropriate to child's level
+- Video avatar with real-time conversation
+- Text overlays when needed (video minimizes)
+
+**Screen 10: Assignment**
+- Request for 2-minute recording
+- Practice areas covered in lesson
+- Must submit before next lesson
+
+**Screen 11: Companion Handover**
+- Tutor introduces Companion by name
+- Mentions shared interest areas
+- Explains Companion speaks target language with system assistance
+- "I will see you tomorrow at X time"
+
+**Screen 12: Companion Session**
+- Companion introduces self (simple words)
+- Discusses interest areas
+- Pulls YouTube content (videos, songs, movies)
+- First session heavy on media
+- Invites sing/speak along
+- "I will see you tomorrow at X time"
+
+### Subsequent Sessions
+
+**Screen 13: Tutor Session (Regular)**
+- Assignment performance review
+- Class placement discussion
+- Encouragement
+- Lesson content
+- New assignment
+
+**Screen 14: Companion Session (Regular)**
+- Cultural content discussion
+- Media integration
+- Conversation practice
+
+### Additional Screens
+
+**Screen 15: Parent Dashboard**
+- Lesson progress
+- Time spent
+- Notes from Tutor
+- Attendance tracking
+- Weekly performance updates
+
+**Screen 16: Community Discussion**
+- Text-based discussion forum
+- Start/comment on discussions
+- See AI and human user posts
+
+**Screen 17: Scoreboard**
+- Assignment scores of all users
+- Access to all user assignments
+- Class rankings
+
+**Screen 18: Assignment Submission**
+- Voice recording interface
+- Can be reading of system content
+- Can be student-generated content on given topic
+- Can incorporate dialogues with parents
+
+**Screen 19: Referral Screen**
+- Gift a free month to a friend
+- Get a free month in return
+
+**Screen 20: Settings/Account Management**
+- Profile management
+- Subscription management
+- Data deletion request
+- Parental controls
+
+---
+
+## Technical Architecture
+
+### Generation Engines
+
+**Presence Engine**:
+- Emulates human presence over Zoom call
+- Generates avatar appropriate to user (often opposite gender)
+- Generates personality (teacher: happy, supportive, energetic, formal; companion: sunny, informal, excited)
+- Consistency over thousands of sessions via embeddings in database
+- Traits embedded in prompts to LLMs
+
+**Relationship Engine**:
+- Long-term memory of shared experiences
+- Remembers preferences, strengths, weaknesses, likes, dislikes
+- Extracts keyword-level summary from past interactions
+- Stores in database, appends to prompts
+- Recency bias for quick updates
+
+### Generation & Conversion
+
+**LLMs**:
+- All content generated by LLMs (conversation, lessons, text, videos)
+- Avatar: Open-source model fine-tuned or HeyGen (cost-effective, highly engaging)
+- Conversations personalized per user
+- YouTube embedding for videos/songs/movies
+- AI students have unique, consistent voices
+
+**STT/TTS**:
+- Speech-to-Text: User speech → text → LLM
+- Text-to-Speech: LLM output → speech
+- Currently used to keep costs low
+- Continuously evaluate voice-to-voice models
+
+### Additional Systems
+
+**Deep Linking**:
+- Campaign-specific deep links
+- Sends information (event, target language, current language) at first interaction
+
+**User Management**:
+- User records, login, audit trail
+- Multiple login methods (Google, FB, email) for same user
+- Distinguish user vs payer
+- Attribution management to signup channel
+- Can use third-party system
+
+**Subscription Management**:
+- Generates paywalls
+- Discounts, referrals, campaign-specific rates
+- A/B testing of paywalls
+- Online payment collection
+- Likely third-party: RevenueCat, Chargebee, Adapty
+
+**Course Progression**:
+- Scoreboard for user and parents
+- Attendance, performance, progression along lesson plan
+
+**Continuous Evaluation**:
+- User feedback (thumbs up/down) for every system response
+- Record entire session for analysis
+- Random anonymized snippet extraction for human evaluation
+- LLM evaluation for variance cases
+
+---
+
+## Compliance Requirements
+
+### COPPA (Children's Online Privacy Protection Act)
+- Privacy Policy: Clear, comprehensive, accessible
+- Verifiable Parental Consent: Before collecting any personal information
+- Direct Notice to Parents: Before collecting child's data
+- Data Minimization: Only necessary information
+- Security Safeguards: Reasonable security measures
+- Parental Access and Control: Review and delete child's data
+- Retention Limits: Delete when no longer needed
+
+### SOPIPA (Student Online Personal Information Protection Act - California)
+- No targeted advertising
+- Restrictions on data use (K-12 school purpose only)
+- Prohibition on selling data
+- Data security measures
+- Parental consent required
+- Data deletion when no longer needed
+
+### Implementation Requirements
+- Verifiable Parental Consent
+- Notice to Parents
+- Data Encryption and security measures
+- Parental access to data
+- Provision for data deletion at parent's request
+- Privacy Policy and Terms of Service (no data usage for ads, selling, etc.)
+
+---
+
+## Points & Rewards System
+
+- Points accrue for all activities
+- Score kept and displayed
+- Points used for in-product flares: profile frames, games, etc.
+- Reward boxes of various qualities
+- Boxes open to lottery-style rewards
+
+---
+
+## Nudges
+
+**Objectives**: Upsell, referral, or resumption of sessions
+
+- **Upsell**: When minutes exhausted (to student and parent)
+- **Referral**: After 1 week of usage (to student and parent)
+- **Resumption**: At any break (to student and parent)
+
+---
+
+## Assignments
+
+- Usually voice recordings
+- Can be reading of system-provided content
+- Can be student-generated content on given topic
+- Should incorporate recording of dialogues with parents
+- Must be submitted before next lesson
+- Graded and uploaded to scoreboard
+
+---
+
+## MVP Exclusions
+
+The following are **NOT** included in MVP (but may be in future):
+- Advanced curriculum levels (MVP focuses on basic levels)
+- Multiple language support beyond initial target languages
+- Advanced gamification features
+- Mobile apps (web-first)
+- Advanced analytics dashboard
+- Multi-child management beyond basic setup
+- Advanced referral tracking
+- Integration with external educational platforms
+
+---
+
+## Current Codebase Structure
+
+### Client (React + Vite)
+- `App.jsx`: Main app component with session management
+- `components/StartScreen.jsx`: Initial screen before session
+- `components/VideoDisplay.jsx`: AI avatar and user video display
+- `components/Controls.jsx`: Mic, video, hangup controls
+- `components/TranscriptionPanel.jsx`: Conversation transcript
+- `components/Overlays.jsx`: Text overlays (subtitles, suggestions)
+- `hooks/useSession.js`: Session management hook
+- `hooks/useTranscription.js`: Transcription handling
+- `services/api.js`: API service layer
+- `utils/audioStreamer.js`: Audio streaming utilities
+
+### Server (Node.js + Express)
+- `app.js`: Express app setup
+- `index.js`: Server entry point
+- `routes/api.js`: Main API routes
+- `routes/heygenRoutes.js`: HeyGen avatar integration
+- `routes/talkRoutes.js`: Talk API routes
+- `services/openAIService.js`: OpenAI integration
+- `services/webSocketService.js`: WebSocket handling
+- `config/db.js`: Database configuration
+- `config/clients.js`: External service clients
+
+### Key Technologies
+- **Frontend**: React, Vite, Clerk (auth), PostHog (analytics)
+- **Backend**: Node.js, Express, MySQL
+- **AI Services**: OpenAI, Deepgram (STT), Google Cloud TTS, HeyGen (avatars)
+- **Real-time**: WebSockets, LiveKit
+
+---
+
+## Development Guidelines
+
+### What to Build
+✅ Focus on MVP goals: 100 signups, 80 retention, 20 referrals
+✅ Prioritize Tutor and Companion modules (Community can be simplified)
+✅ Ensure COPPA/SOPIPA compliance from day one
+✅ High-quality avatar experience (key to retention)
+✅ Low-latency, high-accuracy conversations
+✅ Simple, child-friendly UI (ages 6-12)
+✅ Parent dashboard for monitoring
+✅ Assignment submission and grading
+✅ Basic scoreboard/community features
+
+### What NOT to Build (MVP)
+❌ Advanced curriculum beyond basic levels
+❌ Complex gamification (basic points system only)
+❌ Mobile apps (web-first)
+❌ Advanced analytics
+❌ Multiple language support beyond initial targets
+❌ Complex referral tracking
+❌ Integration with external platforms
+
+### Key Principles
+1. **Engagement First**: Avatar quality and conversation feel are critical for retention
+2. **Compliance Critical**: COPPA/SOPIPA compliance is non-negotiable
+3. **Parent-Child Split**: Remember user (child) vs payer (parent) distinction
+4. **Personalization**: Content must be personalized to child's interests and level
+5. **Low Latency**: Conversations must feel natural (high accuracy, low latency)
+6. **Progressive Disclosure**: Start simple, add complexity as user improves
+7. **Cultural Authenticity**: Companion must authentically represent target culture
+
+---
+
+## Success Criteria
+
+### MVP Success Metrics
+- 100 paying users signed up
+- 80 users retained (80% retention)
+- 20 users from referrals
+- $0 customer acquisition cost
+- 30+ minutes/day average usage
+- High engagement with Tutor and Companion modules
+
+### Technical Success Criteria
+- Avatar latency < 2 seconds
+- STT accuracy > 95%
+- TTS naturalness score > 4/5
+- Session completion rate > 80%
+- Assignment submission rate > 70%
+
+---
+
+## Notes for Development
+
+- **Current State**: Basic video/audio interface exists with HeyGen integration
+- **Next Priorities**: 
+  1. Complete signup/onboarding flow
+  2. Implement Tutor module with assessment and lessons
+  3. Implement Companion module with cultural content
+  4. Build parent dashboard
+  5. Add assignment submission and grading
+  6. Implement basic community/scoreboard
+  7. Add compliance features (consent, data management)
+
+- **Architecture Decisions**:
+  - Use third-party for subscriptions (RevenueCat/Chargebee/Adapty)
+  - Use third-party for user management (Clerk currently in use)
+  - Keep STT/TTS pipeline for now (evaluate voice-to-voice later)
+  - Database for relationship/presence engine (embeddings, summaries)
+
