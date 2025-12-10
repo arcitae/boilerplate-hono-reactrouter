@@ -1,10 +1,9 @@
-import { Hono } from "hono";
 import { createRequestHandler, RouterContextProvider } from "react-router";
+import backendApp from "../app/backend/index";
 
-const app = new Hono();
+const app = backendApp;
 
-// Add more routes here
-
+// React Router catch-all route (must be last)
 app.get("*", (c) => {
   const requestHandler = createRequestHandler(
     () => import("virtual:react-router/server-build"),

@@ -6,17 +6,17 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-import { ClerkProvider } from "@clerk/react-router";
-import { clerkMiddleware, rootAuthLoader } from "@clerk/react-router/server";
-import type { Route } from "./+types/root";
+import { ClerkProvider, SignedIn, SignedOut, UserButton, SignInButton, SignOutButton } from "@clerk/react-router";
+import { clerkMiddleware } from "@clerk/react-router/server";
 
-// Import frontend components
-import "@frontend/app.css";
-import { Header } from "@frontend/components/Header";
+// Types are generated for app/root.tsx, so we import from there
+import type { Route } from "../../.react-router/types/app/+types/root";
+import "./app.css";
+import { Header } from "./components/Header";
 
 export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
 
-export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args);
+// Note: loader is defined in app/root.tsx to ensure React Router calls it correctly
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
