@@ -1,5 +1,6 @@
 import "dotenv/config"; // Load environment variables from .env files
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { requestId } from "hono/request-id";
@@ -17,15 +18,26 @@ import apiRoutes from "./routes/index.js";
 
 /**
  * Get frontend URL from environment
- * Supports both Cloudflare Workers (c.env) and Node.js (process.env)
+ * Supports both Cloudflare Workers (using env adapter) and Node.js (process.env)
  */
-function getFrontendUrl(c?: { env?: Env }): string {
-  if (c?.env?.FRONTEND_URL) {
-    return c.env.FRONTEND_URL;
+function getFrontendUrl(c?: Context<AppContext>): string {
+  // For Cloudflare Workers, use env adapter to extract environment variables
+  if (c) {
+    try {
+      const envVars = env<Env>(c);
+      if (envVars.FRONTEND_URL) {
+        return envVars.FRONTEND_URL;
+      }
+    } catch {
+      // If env adapter fails, fall through to process.env check
+    }
   }
+  
+  // Fallback to process.env for Node.js/local development
   if (typeof process !== "undefined" && process.env?.FRONTEND_URL) {
     return process.env.FRONTEND_URL;
   }
+  
   return "http://localhost:5173";
 }
 

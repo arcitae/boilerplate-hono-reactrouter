@@ -79,11 +79,6 @@ export function apiClient() {
 }
 
 /**
- * Default API client instance
- */
-export const publicApiClient = apiClient();
-
-/**
  * Helper function to get auth headers for authenticated requests
  * This will be used when Clerk tokens are needed
  */

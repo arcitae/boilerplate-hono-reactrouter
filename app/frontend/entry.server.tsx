@@ -2,6 +2,7 @@ import type { AppLoadContext, EntryContext } from "react-router";
 import { ServerRouter } from "react-router";
 import { isbot } from "isbot";
 import { renderToReadableStream } from "react-dom/server";
+import backendApp from "../backend/index.js";
 
 export default async function handleRequest(
   request: Request,
@@ -10,6 +11,28 @@ export default async function handleRequest(
   routerContext: EntryContext,
   _loadContext: AppLoadContext,
 ) {
+  // Intercept /api/* requests and handle them with the backend app
+  // This ensures API routes work in development mode
+  const url = new URL(request.url);
+  if (url.pathname.startsWith("/api/")) {
+    try {
+      const response = await backendApp.fetch(request);
+      return response;
+    } catch (error) {
+      console.error("[Entry Server] Error handling API request:", error);
+      return new Response(
+        JSON.stringify({
+          error: "Internal server error",
+          message: error instanceof Error ? error.message : "Unknown error",
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+  }
+
   let shellRendered = false;
   const userAgent = request.headers.get("user-agent");
 

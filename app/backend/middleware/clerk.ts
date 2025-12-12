@@ -123,7 +123,8 @@ export async function clerkAuth(
       c.set("user", user);
       c.set("userId", auth.userId);
 
-      await next();
+      // Return the response from next() to propagate it through the middleware chain
+      return await next();
     });
   } catch (error) {
     console.error("Clerk authentication error:", error);
@@ -146,38 +147,3 @@ export async function clerkAuth(
   }
 }
 
-/**
- * Optional Clerk authentication middleware
- * Doesn't throw if user is not authenticated, but still populates user if token is valid
- * Useful for routes that work for both authenticated and unauthenticated users
- */
-export async function optionalClerkAuth(
-  c: Context<AppContext>,
-  next: Next
-) {
-  try {
-    const middleware = createClerkMiddleware(c);
-    
-    return middleware(c, async () => {
-      const auth = getAuth(c);
-      
-      if (auth?.userId) {
-        const user: ClerkUser = {
-          id: auth.userId,
-          email: auth.sessionClaims?.email as string | undefined,
-          firstName: auth.sessionClaims?.firstName as string | undefined,
-          lastName: auth.sessionClaims?.lastName as string | undefined,
-          imageUrl: auth.sessionClaims?.imageUrl as string | undefined,
-        };
-
-        c.set("user", user);
-        c.set("userId", auth.userId);
-      }
-
-      await next();
-    });
-  } catch (error) {
-    // For optional auth, continue even if auth fails
-    await next();
-  }
-}

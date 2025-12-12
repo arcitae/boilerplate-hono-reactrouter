@@ -1,6 +1,5 @@
 import type { Context, Next } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { getRuntimeKey } from "hono/adapter";
 import type { AppContext } from "../types/context.js";
 
 /**
@@ -29,8 +28,8 @@ export async function errorHandler(
     return c.res;
   } catch (error) {
     // Log error details (in production, send to monitoring service)
-    const isDevelopment = getRuntimeKey() !== "workerd" || 
-                         (typeof process !== "undefined" && process.env.NODE_ENV === "development");
+    // Only expose detailed errors in development mode
+    const isDevelopment = typeof process !== "undefined" && process.env.NODE_ENV === "development";
 
     if (isDevelopment) {
       console.error("Error:", error);
