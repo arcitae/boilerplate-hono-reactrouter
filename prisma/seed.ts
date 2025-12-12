@@ -1,8 +1,14 @@
-import { PrismaClient, Prisma } from "../app/generated/prisma/client.ts";
+import { PrismaClient, Prisma } from "../app/generated/prisma/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
+import "dotenv/config";
+
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error("DATABASE_URL is not set");
+}
 
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL!,
+  connectionString: databaseUrl,
 });
 
 const prisma = new PrismaClient({
@@ -43,9 +49,28 @@ const userData: Prisma.UserCreateInput[] = [
 ];
 
 export async function main() {
+  console.log("Seeding database...");
+  
   for (const u of userData) {
-    await prisma.user.create({ data: u });
+    // Use upsert to handle existing users gracefully
+    // This will create the user if it doesn't exist, or update if it does
+    const user = await prisma.user.upsert({
+      where: { email: u.email },
+      update: {
+        name: u.name,
+        // Update posts if they exist
+        posts: {
+          deleteMany: {}, // Remove existing posts for this user
+          create: u.posts?.create || [],
+        },
+      },
+      create: u,
+    });
+    
+    console.log(`✓ User ${user.email} processed`);
   }
+  
+  console.log("Database seeded successfully!");
 }
 
 main()

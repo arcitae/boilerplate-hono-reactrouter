@@ -1,38 +1,33 @@
-// import logoDark from "./logo-dark.svg";
-// import logoLight from "./logo-light.svg";
+import { Link } from "react-router";
 import HeaderUser from "./HeaderUser";
 
-export function Header({  }: {  }) {
+export function Header({}: {}) {
   return (
-    <header className="flex items-center justify-center py-8 px-4 border-b border-gray-200 dark:border-gray-800 min-h-[80px]">
-        {/* <SignedOut>
-          <div className="flex flex-col items-center gap-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">You are signed out</p>
-            <SignInButton mode="modal">
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium">
-                Sign In
-              </button>
-            </SignInButton>
-          </div>
-        </SignedOut>
-        <SignedIn>
-          <div className="flex items-center gap-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">You are signed in</p>
-            <UserButton 
-            appearance={{
-              elements: {
-                avatarBox: "w-10 h-10",  // Size
-                userButtonPopoverCard: "shadow-lg"  // Styling
-              }
-            }}
-            />
-
-            <SignOutButton />
-          </div>
-        </SignedIn> */}
-
-        <HeaderUser />
-      </header>
+    <header className="flex items-center justify-between py-4 px-4 border-b border-gray-200 dark:border-gray-800 min-h-[80px]">
+      <nav className="flex items-center gap-6">
+        <Link
+          to="/"
+          className="text-lg font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-600"
+        >
+          Panya
+        </Link>
+        <div className="flex items-center gap-4">
+          <Link
+            to="/users"
+            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+          >
+            Users
+          </Link>
+          <Link
+            to="/posts"
+            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+          >
+            Posts
+          </Link>
+        </div>
+      </nav>
+      <HeaderUser />
+    </header>
   );
 }
 

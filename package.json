@@ -17,7 +17,14 @@
     "publish": true
   },
   "dependencies": {
+    "@clerk/backend": "^2.27.0",
     "@clerk/react-router": "^2.3.3",
+    "@cloudflare/vitest-pool-workers": "^0.10.15",
+    "@hono/clerk-auth": "^3.0.3",
+    "@hono/otel": "^1.0.1",
+    "@hono/standard-validator": "^0.2.0",
+    "@hono/swagger-ui": "^0.5.2",
+    "@hono/zod-validator": "^0.7.5",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.1.0",
     "@react-router/node": "7.10.1",
@@ -26,6 +33,7 @@
     "@tailwindcss/vite": "^4.1.17",
     "dotenv": "^17.2.3",
     "hono": "^4.10.8",
+    "hono-openapi": "^1.1.2",
     "isbot": "5.1.26",
     "lucide-react": "^0.477.0",
     "pg": "^8.16.3",
