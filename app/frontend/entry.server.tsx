@@ -4,6 +4,20 @@ import { isbot } from "isbot";
 import { renderToReadableStream } from "react-dom/server";
 import backendApp from "../backend/index.js";
 
+/**
+ * React Router server-side rendering entry point
+ * 
+ * Architecture:
+ * - In development: React Router dev server uses this file
+ *   - API routes (/api/*) are intercepted and handled by Hono backend
+ *   - Frontend routes are handled by React Router
+ * 
+ * - In production (Cloudflare Workers): workers/app.ts handles everything
+ *   - Hono backend handles /api/* routes
+ *   - React Router catch-all handles frontend routes
+ * 
+ * This dual approach ensures API routes work in both dev and production.
+ */
 export default async function handleRequest(
   request: Request,
   responseStatusCode: number,
@@ -11,8 +25,9 @@ export default async function handleRequest(
   routerContext: EntryContext,
   _loadContext: AppLoadContext,
 ) {
-  // Intercept /api/* requests and handle them with the backend app
-  // This ensures API routes work in development mode
+  // Intercept /api/* requests and handle them with the Hono backend
+  // This is necessary in development mode where React Router dev server
+  // processes all requests before they reach workers/app.ts
   const url = new URL(request.url);
   if (url.pathname.startsWith("/api/")) {
     try {
