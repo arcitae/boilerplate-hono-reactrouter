@@ -1,84 +1,46 @@
 import "dotenv/config"; // Load environment variables from .env files
 import { Hono } from "hono";
-import type { Context } from "hono";
-import { cors } from "hono/cors";
-import { logger } from "hono/logger";
-import { requestId } from "hono/request-id";
-import { httpInstrumentationMiddleware } from "@hono/otel";
-import { env } from "hono/adapter";
 import type { AppContext } from "./types/context.js";
-import type { Env } from "./types/env.js";
 
-// Import middleware
+// Import middleware (using centralized registry)
 import withPrisma from "./lib/prisma.js";
-import { errorHandler, notFoundHandler } from "./middleware/error-handler.js";
+import {
+  applyMiddleware,
+  getMiddlewareConfig,
+  errorHandler,
+  notFoundHandler,
+} from "./middleware/index.js";
 
 // Import routes
 import apiRoutes from "./routes/index.js";
 
 /**
- * Get frontend URL from environment
- * Supports both Cloudflare Workers (using env adapter) and Node.js (process.env)
- */
-function getFrontendUrl(c?: Context<AppContext>): string {
-  // For Cloudflare Workers, use env adapter to extract environment variables
-  if (c) {
-    try {
-      const envVars = env<Env>(c);
-      if (envVars.FRONTEND_URL) {
-        return envVars.FRONTEND_URL;
-      }
-    } catch {
-      // If env adapter fails, fall through to process.env check
-    }
-  }
-  
-  // Fallback to process.env for Node.js/local development
-  if (typeof process !== "undefined" && process.env?.FRONTEND_URL) {
-    return process.env.FRONTEND_URL;
-  }
-  
-  return "http://localhost:5173";
-}
-
-/**
  * Main Hono application
  * All middleware is applied in the correct order for proper execution
+ * 
+ * Middleware order (applied via applyMiddleware):
+ * 1. Request ID - Generate unique ID first (for tracing)
+ * 2. Logger - Log all requests (needs request ID)
+ * 3. OpenTelemetry - Start distributed tracing (needs request ID)
+ * 4. CORS - Handle cross-origin requests
+ * 5. Secure Headers - Add security headers
+ * 6. Compression - Compress responses (disabled for Cloudflare Workers)
  */
 const app = new Hono<AppContext>();
 
-// Middleware order (critical - must follow this order):
-// 1. Request ID - Generate unique ID first (for tracing)
-app.use("*", requestId());
+// Apply middleware using centralized factory
+// Configuration is environment-aware (dev vs prod)
+// Note: We use a default config here, but middleware factories
+// will get actual context when requests come in
+const middlewareConfig = getMiddlewareConfig();
+applyMiddleware(app, middlewareConfig);
 
-// 2. Logger - Log all requests (needs request ID)
-app.use("*", logger());
-
-// 3. OpenTelemetry - Start distributed tracing (needs request ID)
-// Note: For Cloudflare Workers, OpenTelemetry setup may require additional configuration
-app.use(
-  "*",
-  httpInstrumentationMiddleware({
-    serviceName: "panya-api",
-  })
-);
-
-// 4. CORS - Handle cross-origin requests
-app.use("*", (c, next) => {
-  const frontendUrl = getFrontendUrl(c);
-  return cors({
-    origin: frontendUrl,
-    credentials: true,
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization"],
-  })(c, next);
-});
-
-// 5. Prisma middleware - Inject Prisma client into context
+// 7. Prisma middleware - Inject Prisma client into context
 // Applied globally so all routes have access to database
+// This is after other middleware but before routes
 app.use("*", withPrisma);
 
-// 6. Error handler - Must be before routes to catch errors
+// 8. Error handler - Must be before routes to catch errors
 app.onError((err, c) => {
   return errorHandler(c, async () => {
     throw err;
