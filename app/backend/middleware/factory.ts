@@ -74,19 +74,21 @@ export function applyMiddleware(
 
   // 4. CORS - Handle cross-origin requests
   // Note: CORS needs context, so we apply it dynamically
+  // Explicitly await to ensure proper error propagation through the middleware chain
   app.use("*", async (c: Context<AppContext>, next: Next) => {
     const corsFactory = createCorsMiddleware(config.cors);
     const corsMiddleware = corsFactory(c);
-    return corsMiddleware(c, next);
+    return await corsMiddleware(c, next);
   });
 
   // 5. Secure Headers - Add security headers
+  // Explicitly await to ensure proper error propagation through the middleware chain
   app.use("*", async (c: Context<AppContext>, next: Next) => {
     const secureHeadersFactory = createSecureHeadersMiddlewareFactory(
       config.secureHeaders
     );
     const secureHeadersMiddleware = secureHeadersFactory(c);
-    return secureHeadersMiddleware(c, next);
+    return await secureHeadersMiddleware(c, next);
   });
 
   // 6. Compression - Compress responses (if enabled)
