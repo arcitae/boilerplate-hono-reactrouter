@@ -212,4 +212,4 @@ const posts = new Hono<AppContext>()
   );
 
 export default posts;
-export type PostsAppType = typeof posts;
+export type AppType = typeof posts;

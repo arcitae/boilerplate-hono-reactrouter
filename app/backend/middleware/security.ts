@@ -30,22 +30,43 @@ function getSecureHeadersConfig(
     contentSecurityPolicy: isDevelopment
       ? {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // Allow inline scripts in dev
-          styleSrc: ["'self'", "'unsafe-inline'", "https:"], // Allow inline styles in dev
+          scriptSrc: [
+            "'self'",
+            "'unsafe-inline'",
+            "'unsafe-eval'",
+            "https://cdn.jsdelivr.net", // Swagger UI CDN
+            "https://unpkg.com", // Alternative CDN for Swagger UI
+          ],
+          styleSrc: [
+            "'self'",
+            "'unsafe-inline'",
+            "https:",
+            "https://cdn.jsdelivr.net", // Swagger UI styles
+            "https://unpkg.com", // Alternative CDN for Swagger UI
+          ],
           imgSrc: ["'self'", "data:", "https:"],
           connectSrc: ["'self'", "https:"],
-          fontSrc: ["'self'", "https:", "data:"],
+          fontSrc: ["'self'", "https:", "data:", "https://cdn.jsdelivr.net"],
           objectSrc: ["'none'"],
           mediaSrc: ["'self'"],
           frameSrc: ["'self'"],
         }
       : {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'"], // Strict in production
-          styleSrc: ["'self'", "https:"],
+          scriptSrc: [
+            "'self'",
+            "https://cdn.jsdelivr.net", // Swagger UI CDN
+            "https://unpkg.com", // Alternative CDN for Swagger UI
+          ],
+          styleSrc: [
+            "'self'",
+            "https:",
+            "https://cdn.jsdelivr.net", // Swagger UI styles
+            "https://unpkg.com", // Alternative CDN for Swagger UI
+          ],
           imgSrc: ["'self'", "data:", "https:"],
           connectSrc: ["'self'", "https:"],
-          fontSrc: ["'self'", "https:", "data:"],
+          fontSrc: ["'self'", "https:", "data:", "https://cdn.jsdelivr.net"],
           objectSrc: ["'none'"],
           mediaSrc: ["'self'"],
           frameSrc: ["'self'"],

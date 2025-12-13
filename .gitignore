@@ -203,3 +203,6 @@ dist
 /build/
 
 /src/generated/prisma
+
+### Generated API Documentation ###
+/openapi/openapi.json

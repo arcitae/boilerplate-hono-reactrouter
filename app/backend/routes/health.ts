@@ -48,4 +48,4 @@ const health = new Hono<AppContext>()
   });
 
 export default health;
-export type HealthAppType = typeof health;
+export type AppType = typeof health;

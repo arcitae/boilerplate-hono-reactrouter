@@ -65,3 +65,13 @@ export { clerkAuth, createClerkMiddleware } from "./clerk.js";
 
 // Error handling
 export { errorHandler, notFoundHandler } from "./error-handler.js";
+
+// Combine middleware utilities
+export {
+  createConditionalAuth,
+  createAuthOrRateLimit,
+  createAuthAndCheck,
+  some,
+  every,
+  except,
+} from "./combine.js";

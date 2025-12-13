@@ -47,6 +47,7 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.13.8",
     "@cloudflare/workers-types": "^4.20251209.0",
+    "@rcmade/hono-docs": "^1.0.31",
     "@react-router/dev": "^7.9.0",
     "@types/node": "24.0.4",
     "@types/pg": "^8.15.6",
@@ -79,6 +80,7 @@
     "db:push": "dotenv -e .env.local -- prisma db push",
     "db:migrate": "dotenv -e .env.local -- prisma migrate dev",
     "db:studio": "dotenv -e .env.local -- prisma studio",
-    "db:seed": "dotenv -e .env.local -- prisma db seed"
+    "db:seed": "dotenv -e .env.local -- prisma db seed",
+    "docs:generate": "npx @rcmade/hono-docs generate --config ./hono-docs.ts"
   }
 }

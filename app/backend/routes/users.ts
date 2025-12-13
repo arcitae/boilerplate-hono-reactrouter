@@ -186,4 +186,4 @@ const users = new Hono<AppContext>()
   );
 
 export default users;
-export type UsersAppType = typeof users;
+export type AppType = typeof users;
