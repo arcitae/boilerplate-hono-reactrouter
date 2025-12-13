@@ -27,6 +27,7 @@
     "@hono/zod-validator": "^0.7.5",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.1.0",
+    "@react-router/fs-routes": "^7.10.1",
     "@react-router/node": "7.10.1",
     "@react-router/serve": "7.10.1",
     "@t3-oss/env-core": "^0.13.8",
