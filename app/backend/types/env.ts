@@ -14,6 +14,7 @@ export type Env = {
 
   // Application
   FRONTEND_URL?: string;
+  BACKEND_URL?: string;
   NODE_ENV?: "development" | "production" | "test";
 
   // Cloudflare Workers specific

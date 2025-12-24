@@ -1,144 +1,134 @@
-# Project Architecture
+# Architecture: Separate Frontend and Backend Workers
 
-This document describes the codebase organization and structure.
+This project uses a **two-worker architecture** with separate Cloudflare Workers for frontend and backend.
 
-## Folder Structure
+## Architecture Overview
 
 ```
-app/
-├── root.tsx           # React Router root (re-exports from frontend/root.tsx)
-├── entry.server.tsx   # SSR entry (re-exports from frontend/entry.server.tsx)
-├── routes.ts          # Route configuration
-│
-├── frontend/          # React Router frontend code
-│   ├── routes/        # React Router route files
-│   ├── components/    # React components
-│   ├── root.tsx       # Root layout component (actual implementation)
-│   ├── entry.server.tsx  # SSR entry point (actual implementation)
-│   └── app.css        # Global styles
-│
-├── backend/           # Hono API backend code
-│   ├── routes/        # API route handlers
-│   ├── middleware/    # Hono middleware
-│   ├── services/      # Business logic
-│   ├── schemas/       # Zod validation schemas
-│   ├── lib/           # Backend utilities (Prisma, etc.)
-│   └── index.ts       # Main Hono app (exports AppType)
-│
-└── shared/            # Shared code (types, utilities)
-    └── (shared code that both frontend and backend can use)
+┌─────────────────────┐         HTTP         ┌─────────────────────┐
+│  Frontend Worker    │ ───────────────────> │  Backend Worker     │
+│  (React Router)     │   API Requests       │  (Hono)             │
+│                     │ <─────────────────── │                     │
+│  - Handles UI       │      JSON Responses  │  - Handles /api/*   │
+│  - SSR/CSR          │                       │  - Database access   │
+│  - Static assets    │                       │  - Business logic   │
+└─────────────────────┘                       └─────────────────────┘
+```
 
+## Benefits
+
+1. **Independent Scaling**: Frontend and backend can scale independently
+2. **Technology Flexibility**: Backend can be moved to containers/other platforms without affecting frontend
+3. **Clean Separation**: Clear boundaries between frontend and backend
+4. **Simpler Development**: No complex integration code, just HTTP requests
+5. **Easier Debugging**: Each worker can be tested independently
+
+## File Structure
+
+```
 workers/
-└── app.ts             # Cloudflare Worker entry point
+├── backend.ts          # Backend worker entry point
+└── frontend.ts         # Frontend worker entry point
+
+wrangler.backend.toml   # Backend worker configuration
+wrangler.frontend.toml  # Frontend worker configuration
+
+app/
+├── frontend/           # React Router frontend code
+│   ├── entry.server.tsx
+│   ├── lib/
+│   │   └── api-client.ts  # HTTP client for backend API
+│   └── ...
+└── backend/            # Hono backend code
+    ├── index.ts
+    ├── routes/
+    └── ...
 ```
 
-**Note:** React Router requires `root.tsx`, `entry.server.tsx`, and `routes.ts` at the `app/` root level. These files are thin wrappers that re-export from `app/frontend/` to maintain our folder structure while satisfying React Router's requirements.
+## Development
 
-## Path Aliases
+### Local Development
 
-The project uses path aliases for clean imports:
+**Option 1: Run both workers separately (recommended)**
+```bash
+# Terminal 1: Start backend worker
+npm run dev:backend
 
-- `@frontend/*` → `app/frontend/*`
-- `@backend/*` → `app/backend/*`
-- `@shared/*` → `app/shared/*`
+# Terminal 2: Start frontend dev server
+npm run dev:frontend
+```
 
-### Usage Examples
+**Option 2: Run both together**
+```bash
+npm run dev:all
+```
 
-**Frontend:**
+The frontend dev server (React Router) will proxy `/api/*` requests to the backend worker at `http://localhost:8787`.
+
+### Environment Variables
+
+**Backend Worker** (`wrangler.backend.toml`):
+- `DATABASE_URL` - PostgreSQL connection string
+- `CLERK_SECRET_KEY` - Clerk authentication secret
+- `VITE_CLERK_PUBLISHABLE_KEY` - Clerk publishable key
+- Other API keys (OpenAI, Deepgram, etc.)
+
+**Frontend Worker** (`wrangler.frontend.toml`):
+- `BACKEND_URL` - Backend worker URL (for server-side requests)
+- `VITE_BACKEND_URL` - Backend worker URL (for client-side requests)
+- `VITE_CLERK_PUBLISHABLE_KEY` - Clerk publishable key
+
+## Deployment
+
+### Deploy Both Workers
+
+```bash
+# Deploy backend first
+npm run deploy:backend
+
+# Update wrangler.frontend.toml with backend worker URL
+# Then deploy frontend
+npm run deploy:frontend
+
+# Or deploy both at once
+npm run deploy:all
+```
+
+### Update Backend URL
+
+After deploying the backend worker, update `wrangler.frontend.toml`:
+
+```toml
+[vars]
+BACKEND_URL = "https://your-backend-worker.your-subdomain.workers.dev"
+VITE_BACKEND_URL = "https://your-backend-worker.your-subdomain.workers.dev"
+```
+
+## API Client
+
+The frontend uses a type-safe API client (`app/frontend/lib/api-client.ts`) that:
+
+- **Client-side**: Makes HTTP requests to `VITE_BACKEND_URL`
+- **Server-side**: Makes HTTP requests to `BACKEND_URL`
+- Uses Hono's `hc<AppType>` for full type safety
+
+Example usage:
 ```typescript
-import { Header } from "@frontend/components/Header";
-import { someUtil } from "@shared/utils";
+import { apiClient } from "@frontend/lib/api-client";
+
+const client = apiClient();
+const res = await client.api.posts.$get({ query: { page: "1" } });
+const data = await res.json();
 ```
 
-**Backend:**
-```typescript
-import { prisma } from "@backend/lib/prisma";
-import { validateUser } from "@shared/validation";
-```
+## CORS Configuration
 
-**Shared:**
-```typescript
-// Can import from shared in both frontend and backend
-import { UserType } from "@shared/types";
-```
+The backend worker is configured to allow requests from the frontend worker origin. CORS settings are in `app/backend/middleware/config.ts`.
 
-## Code Isolation
+## Future Migration
 
-### ✅ Frontend Code (`app/frontend/`)
-- React components and pages
-- React Router routes and loaders
-- Client-side state management
-- UI components
+If you need to move the backend to containers or another platform:
 
-**Rules:**
-- ✅ Can import from `@shared/*`
-- ✅ Can import from `@frontend/*`
-- ❌ **NEVER** import from `@backend/*`
-- ❌ No direct database access
-- ❌ No server-only APIs
-
-### ✅ Backend Code (`app/backend/`)
-- Hono API routes
-- Database operations (Prisma)
-- Business logic
-- Server-side middleware
-
-**Rules:**
-- ✅ Can import from `@shared/*`
-- ✅ Can import from `@backend/*`
-- ❌ **NEVER** import from `@frontend/*`
-- ✅ All database operations happen here
-- ✅ All API endpoints defined here
-
-### ✅ Shared Code (`app/shared/`)
-- Type definitions
-- Utility functions
-- Validation schemas (Zod)
-- Constants
-
-**Rules:**
-- ✅ Must be safe for both browser and server
-- ❌ No backend-specific code (database, file system)
-- ❌ No frontend-specific code (React components, browser APIs)
-
-## Build Configuration
-
-### Vite Configuration
-- Path aliases configured in `vite.config.ts`
-- Backend code excluded from client bundle
-- Frontend code properly isolated
-
-### TypeScript Configuration
-- Path aliases configured in `tsconfig.cloudflare.json`
-- Proper type checking for all aliases
-
-## Development Workflow
-
-1. **Frontend Development**: Work in `app/frontend/`
-2. **Backend Development**: Work in `app/backend/`
-3. **Shared Code**: Add to `app/shared/` when needed by both
-
-## API Communication
-
-Frontend communicates with backend through:
-1. React Router loaders/actions (server-side)
-2. Type-safe API calls using `hc<AppType>` client
-3. Backend exports `AppType` from `app/backend/index.ts`
-
-Example:
-```typescript
-// Frontend loader
-import { AppType } from "@backend/index";
-import { hc } from "hono/client";
-
-const client = hc<AppType>(process.env.API_URL);
-const res = await client.api.users.$get();
-```
-
-## Important Notes
-
-- **Backend code is excluded from browser bundle** via Vite configuration
-- **Type safety** is maintained through TypeScript path aliases
-- **Clear separation** prevents accidental code leakage
-- **Shared code** must be environment-agnostic
-
+1. Update `BACKEND_URL` and `VITE_BACKEND_URL` in `wrangler.frontend.toml`
+2. No changes needed to frontend code
+3. Backend remains a standard Hono application

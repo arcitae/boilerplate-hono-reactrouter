@@ -1,0 +1,16 @@
+# Backend Worker Configuration
+# Handles all /api/* routes via Hono
+
+name = "boilerplate-backend"
+main = "./workers/backend.ts"
+compatibility_date = "2025-10-08"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[vars]
+NODE_ENV = "production"
+# Add your environment variables here
+# They will be available in c.env in your Hono routes
+

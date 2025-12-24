@@ -11,7 +11,14 @@ import type { ClerkUser } from "../types/context.js";
  * Supports both Cloudflare Workers (c.env) and Node.js (process.env)
  */
 function getClerkSecretKey(c: Context<AppContext>): string {
-  const envVars = env<Env>(c);
+  // Get environment variables from Hono context
+  // Fallback to process.env if context doesn't have env (e.g., when called from React Router dev server)
+  let envVars: Env = {};
+  try {
+    envVars = env<Env>(c) || {};
+  } catch {
+    // If env() fails, use empty object and fall back to process.env
+  }
   
   if (envVars.CLERK_SECRET_KEY) {
     return envVars.CLERK_SECRET_KEY;
@@ -32,7 +39,14 @@ function getClerkSecretKey(c: Context<AppContext>): string {
  * Falls back to CLERK_PUBLISHABLE_KEY for backward compatibility
  */
 function getClerkPublishableKey(c: Context<AppContext>): string {
-  const envVars = env<Env>(c);
+  // Get environment variables from Hono context
+  // Fallback to process.env if context doesn't have env (e.g., when called from React Router dev server)
+  let envVars: Env = {};
+  try {
+    envVars = env<Env>(c) || {};
+  } catch {
+    // If env() fails, use empty object and fall back to process.env
+  }
   
   // Prefer VITE_CLERK_PUBLISHABLE_KEY (used by both frontend and backend)
   if (envVars.VITE_CLERK_PUBLISHABLE_KEY) {

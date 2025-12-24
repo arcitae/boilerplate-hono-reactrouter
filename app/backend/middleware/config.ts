@@ -61,9 +61,9 @@ export function getMiddlewareConfig(c?: Context<AppContext>): MiddlewareConfig {
   let envVars: Env = {};
   if (c) {
     try {
-      envVars = env<Env>(c);
+      envVars = env<Env>(c) || {};
     } catch {
-      // Fallback to process.env
+      // If env() fails, use empty object and fall back to process.env
     }
   }
 

@@ -13,6 +13,7 @@ import type { Route } from "./+types/root";
 // Import frontend components
 import "@frontend/app.css";
 import { Header } from "@frontend/components/Header";
+import { PHProvider } from "@frontend/provider";
 
 export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
 
@@ -41,9 +42,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
+        <PHProvider>
+          {children}
+          <ScrollRestoration />
+          <Scripts />
+        </PHProvider>
       </body>
     </html>
   );

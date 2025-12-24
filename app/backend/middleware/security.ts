@@ -17,7 +17,23 @@ type SecureHeadersConfig = Parameters<typeof secureHeaders>[0];
 function getSecureHeadersConfig(
   c: Context<AppContext>
 ): SecureHeadersConfig {
-  const envVars = env<Env>(c);
+  // Get environment variables from Hono context
+  // Fallback to process.env if context doesn't have env (e.g., when called from React Router dev server)
+  let envVars: Env = {};
+  try {
+    envVars = env<Env>(c) || {};
+  } catch {
+    // If env() fails, use empty object and fall back to process.env
+  }
+  
+  // Fallback to process.env for Node.js/local development
+  if (typeof process !== "undefined" && process.env) {
+    envVars = {
+      ...envVars,
+      NODE_ENV: (process.env.NODE_ENV as Env["NODE_ENV"]) || envVars.NODE_ENV,
+    };
+  }
+  
   const isDevelopment =
     envVars.NODE_ENV === "development" ||
     (typeof process !== "undefined" && process.env?.NODE_ENV === "development");

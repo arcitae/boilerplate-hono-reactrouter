@@ -1,4 +1,9 @@
-import "dotenv/config"; // Load environment variables from .env files
+// Note: dotenv is NOT imported here because:
+// 1. In Cloudflare Workers: Wrangler automatically loads .env files
+// 2. In Node.js: Can be loaded separately if needed
+// 3. dotenv uses Node.js file system APIs that don't work in Workers
+// If you need dotenv for Node.js-only code, import it conditionally there
+
 import { Hono } from "hono";
 import type { AppContext } from "./types/context.js";
 

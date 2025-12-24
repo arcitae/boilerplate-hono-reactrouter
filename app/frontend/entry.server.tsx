@@ -1,52 +1,41 @@
 import type { AppLoadContext, EntryContext } from "react-router";
-import { ServerRouter } from "react-router";
+import { ServerRouter, RouterContextProvider } from "react-router";
 import { isbot } from "isbot";
 import { renderToReadableStream } from "react-dom/server";
-import backendApp from "../backend/index.js";
 
 /**
  * React Router server-side rendering entry point
  * 
  * Architecture:
- * - In development: React Router dev server uses this file
- *   - API routes (/api/*) are intercepted and handled by Hono backend
- *   - Frontend routes are handled by React Router
+ * - Frontend worker handles all frontend routes via React Router
+ * - Backend worker handles all /api/* routes via Hono (separate worker)
+ * - Frontend makes HTTP requests to backend worker
  * 
- * - In production (Cloudflare Workers): workers/app.ts handles everything
- *   - Hono backend handles /api/* routes
- *   - React Router catch-all handles frontend routes
- * 
- * This dual approach ensures API routes work in both dev and production.
+ * This separation allows:
+ * - Independent scaling of frontend and backend
+ * - Backend can be moved to containers/other platforms in future
+ * - Cleaner architecture with clear boundaries
  */
+
+/**
+ * Get load context for React Router
+ * CRITICAL: When middleware is enabled, this MUST return RouterContextProvider
+ * React Router validates this before calling handleRequest
+ */
+export function getLoadContext(): RouterContextProvider {
+  const context = new RouterContextProvider();
+  return context;
+}
+
 export default async function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
   routerContext: EntryContext,
-  _loadContext: AppLoadContext,
+  loadContext: AppLoadContext,
 ) {
-  // Intercept /api/* requests and handle them with the Hono backend
-  // This is necessary in development mode where React Router dev server
-  // processes all requests before they reach workers/app.ts
-  const url = new URL(request.url);
-  if (url.pathname.startsWith("/api/")) {
-    try {
-      const response = await backendApp.fetch(request);
-      return response;
-    } catch (error) {
-      console.error("[Entry Server] Error handling API request:", error);
-      return new Response(
-        JSON.stringify({
-          error: "Internal server error",
-          message: error instanceof Error ? error.message : "Unknown error",
-        }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
-  }
+  // When middleware is enabled, loadContext is a RouterContextProvider instance
+  // returned from getLoadContext(). React Router validates this automatically.
 
   let shellRendered = false;
   const userAgent = request.headers.get("user-agent");
