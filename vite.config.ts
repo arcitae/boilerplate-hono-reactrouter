@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
       ...(isDev ? [] : [
         cloudflare({ 
           viteEnvironment: { name: "ssr" },
-          configPath: "./wrangler.frontend.toml",
+          configPath: "./wrangler.toml",
         })
       ]),
       tailwindcss(),

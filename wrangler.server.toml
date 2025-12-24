@@ -1,8 +1,8 @@
 # Backend Worker Configuration
 # Handles all /api/* routes via Hono
 
-name = "boilerplate-backend"
-main = "./workers/backend.ts"
+name = "boilerplate-server"
+main = "./workers/server.ts"
 compatibility_date = "2025-10-08"
 compatibility_flags = ["nodejs_compat"]
 
