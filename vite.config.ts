@@ -5,25 +5,19 @@ import { defineConfig } from "vite";
 import viteTsConfigPaths from 'vite-tsconfig-paths';
 import path from "node:path";
 
-export default defineConfig(({ mode }) => {
-  const isDev = mode === "development";
-  
+export default defineConfig(() => {
   return {
     plugins: [
       // Cloudflare plugin - only active in production builds
       // In dev, React Router's dev server uses entry.server.tsx directly
       // The plugin is needed for production builds to Cloudflare Workers
-      ...(isDev ? [] : [
-        cloudflare({ 
-          viteEnvironment: { name: "ssr" },
-          configPath: "./wrangler.toml",
-        })
-      ]),
+      cloudflare({ 
+        viteEnvironment: { name: "ssr" },
+        configPath: "./wrangler.client.jsonc",
+      }),
       tailwindcss(),
       reactRouter(), // reactRouter() already includes React support, no need for viteReact()
-      viteTsConfigPaths({
-        projects: ['./tsconfig.json'],
-      }),
+      viteTsConfigPaths(),
     ],
     resolve: {
       alias: {
