@@ -1,11 +1,11 @@
 {
-    "$schema": "./node_modules/wrangler/config-schema.json",
+    "$schema": "../../../node_modules/wrangler/config-schema.json",
     "name": "boilerplate-client",
-    "main": "workers/client.ts",
-    "compatibility_date": "2025-10-08",
+    "main": "./client.ts",
+    "compatibility_date": "2025-11-17",
     "compatibility_flags": ["nodejs_compat"],
     "assets": {
-      "directory": "build/client"
+      "directory": "../../../build/client"
     },
     "observability": {
       "enabled": true

@@ -12,8 +12,8 @@ import type { Route } from "./+types/root";
 
 // Import frontend components
 import "@frontend/app.css";
-import { Header } from "@frontend/components/Header";
-import { PHProvider } from "@frontend/provider";
+import { Header } from "~/client/components/Header";
+import { PHProvider } from "~/client/provider";
 
 export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
 

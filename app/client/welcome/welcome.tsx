@@ -28,7 +28,7 @@ export function Welcome({ message }: { message: string }) {
         </header>
         <div className="p-8">
           <h1 className="text-2xl font-bold mb-4">
-            Welcome to the <strong>{organization?.name}</strong> organization
+            Welcome to the <strong>{organization?.name}</strong> organization!
           </h1>
           <p className="mb-6">
             Your role in this organization:{' '}

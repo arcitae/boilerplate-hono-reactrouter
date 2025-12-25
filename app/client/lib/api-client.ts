@@ -1,5 +1,5 @@
 import { hc } from "hono/client";
-import type { AppType } from "../../backend";
+import type { AppType } from "../../server";
 
 /**
  * Get the base URL for API requests

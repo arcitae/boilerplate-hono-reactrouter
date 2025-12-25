@@ -1,0 +1,23 @@
+{
+    "$schema": "../../node_modules/wrangler/config-schema.json",
+    "name": "boilerplate-server",
+    "main": "./server.ts",
+    "compatibility_date": "2025-11-17",
+    "compatibility_flags": ["nodejs_compat"],
+    "workers_dev": false,
+    "observability": {
+      "enabled": true
+    },
+    // "vars": {
+    //   "NODE_ENV": "production"
+    // },
+    // "env": {
+    //   "local": {
+    //     "name": "boilerplate-server-staging",
+    //     "route": {
+    //       "pattern": "staging.boilerplate-server.com/*",
+    //       "zone_name": "boilerplate-server.com"
+    //     },
+    //   }
+    // }
+  }

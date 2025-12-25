@@ -1,26 +1,14 @@
-import type { AppLoadContext, EntryContext } from "react-router";
+import type { EntryContext } from "react-router";
 import { ServerRouter, RouterContextProvider } from "react-router";
 import { isbot } from "isbot";
 import { renderToReadableStream } from "react-dom/server";
 
 /**
- * React Router server-side rendering entry point
- * 
- * Architecture:
- * - Frontend worker handles all frontend routes via React Router
- * - Backend worker handles all /api/* routes via Hono (separate worker)
- * - Frontend makes HTTP requests to backend worker
- * 
- * This separation allows:
- * - Independent scaling of frontend and backend
- * - Backend can be moved to containers/other platforms in future
- * - Cleaner architecture with clear boundaries
- */
-
-/**
  * Get load context for React Router
- * CRITICAL: When middleware is enabled, this MUST return RouterContextProvider
+ * CRITICAL: When middleware is enabled, this MUST return a RouterContextProvider instance
  * React Router validates this before calling handleRequest
+ * 
+ * @see https://reactrouter.com/how-to/middleware
  */
 export function getLoadContext(): RouterContextProvider {
   const context = new RouterContextProvider();
@@ -32,19 +20,17 @@ export default async function handleRequest(
   responseStatusCode: number,
   responseHeaders: Headers,
   routerContext: EntryContext,
-  loadContext: AppLoadContext,
+  loadContext: RouterContextProvider
 ) {
-  // When middleware is enabled, loadContext is a RouterContextProvider instance
-  // returned from getLoadContext(). React Router validates this automatically.
-
   let shellRendered = false;
+  let statusCode = responseStatusCode;
   const userAgent = request.headers.get("user-agent");
 
   const body = await renderToReadableStream(
     <ServerRouter context={routerContext} url={request.url} />,
     {
       onError(error: unknown) {
-        responseStatusCode = 500;
+        statusCode = 500;
         // Log streaming rendering errors from inside the shell.  Don't log
         // errors encountered during initial shell rendering since they'll
         // reject and get logged in handleDocumentRequest.
@@ -52,7 +38,7 @@ export default async function handleRequest(
           console.error(error);
         }
       },
-    },
+    }
   );
   shellRendered = true;
 
@@ -65,6 +51,6 @@ export default async function handleRequest(
   responseHeaders.set("Content-Type", "text/html");
   return new Response(body, {
     headers: responseHeaders,
-    status: responseStatusCode,
+    status: statusCode,
   });
 }

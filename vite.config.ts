@@ -13,7 +13,7 @@ export default defineConfig(() => {
       // The plugin is needed for production builds to Cloudflare Workers
       cloudflare({ 
         viteEnvironment: { name: "ssr" },
-        configPath: "./wrangler.client.jsonc",
+        configPath: "./app/client/workers/wrangler.jsonc",
       }),
       tailwindcss(),
       reactRouter(), // reactRouter() already includes React support, no need for viteReact()
@@ -21,8 +21,8 @@ export default defineConfig(() => {
     ],
     resolve: {
       alias: {
-        "@frontend": path.resolve(__dirname, "./app/frontend"),
-        "@backend": path.resolve(__dirname, "./app/backend"),
+        "@frontend": path.resolve(__dirname, "./app/client"),
+        "@backend": path.resolve(__dirname, "./app/server"),
         "@shared": path.resolve(__dirname, "./app/shared"),
       },
     },
@@ -49,9 +49,9 @@ export default defineConfig(() => {
         external: (id) => {
           // Exclude backend code from client bundle
           if (
-            id.includes("/app/backend/") ||
+            id.includes("/app/server/") ||
             id.startsWith("@backend/") ||
-            id.includes("\\app\\backend\\") // Windows paths
+            id.includes("\\app\\server\\") // Windows paths
           ) {
             return true;
           }

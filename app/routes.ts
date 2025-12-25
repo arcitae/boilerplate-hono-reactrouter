@@ -3,7 +3,7 @@ import { flatRoutes } from "@react-router/fs-routes";
 
 export default flatRoutes({
   // Routes are in app/frontend/routes directory
-  rootDirectory: "frontend/routes",
+  rootDirectory: "client/routes",
 }) satisfies RouteConfig;
 // export default [
 //   index("frontend/routes/home.tsx"),
