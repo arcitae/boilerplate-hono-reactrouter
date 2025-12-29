@@ -14,10 +14,44 @@ import type { Route } from "./+types/root";
 import "@frontend/app.css";
 import { Header } from "~/client/components/Header";
 import { PHProvider } from "~/client/provider";
+import { cloudflareContext } from "./context";
 
 export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
 
-export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args);
+export const loader = async (args: Route.LoaderArgs) => {
+  // Get Clerk auth data from rootAuthLoader
+  const authData = await rootAuthLoader(args);
+  
+  // Get Clerk publishable key from Cloudflare worker env
+  // This is needed because Vite env vars are replaced at build time
+  // and not available at runtime in Cloudflare Workers
+  let publishableKey: string | undefined;
+  
+  try {
+    const cloudflareData = args.context.get(cloudflareContext);
+    if (cloudflareData?.env) {
+      // Try VITE_CLERK_PUBLISHABLE_KEY first (preferred)
+      publishableKey = cloudflareData.env.VITE_CLERK_PUBLISHABLE_KEY;
+      // Fallback to CLERK_PUBLISHABLE_KEY
+      if (!publishableKey) {
+        publishableKey = cloudflareData.env.CLERK_PUBLISHABLE_KEY;
+      }
+    }
+  } catch (error) {
+    console.warn("Could not get Clerk publishable key from Cloudflare env:", error);
+  }
+  
+  // Fallback to import.meta.env for local development
+  if (!publishableKey) {
+    publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+  }
+  
+  // Return auth data with publishable key
+  return {
+    ...authData,
+    clerkPublishableKey: publishableKey,
+  };
+};
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -55,7 +89,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App({ loaderData }: Route.ComponentProps) {
   // Debug: Check if Clerk keys are set (only in dev)
   if (import.meta.env.DEV) {
-    console.log("Clerk Publishable Key:", import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? "Set" : "Missing");
+    console.log("Clerk Publishable Key:", loaderData?.clerkPublishableKey ? "Set" : "Missing");
     console.log("LoaderData:", loaderData);
   }
 
@@ -65,10 +99,18 @@ export default function App({ loaderData }: Route.ComponentProps) {
     return <div>Error: Missing authentication data</div>;
   }
 
+  // Get publishable key from loaderData (from Cloudflare env) or fallback to import.meta.env
+  const publishableKey = loaderData.clerkPublishableKey || import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+  if (!publishableKey) {
+    console.error("Clerk publishable key is missing! Set VITE_CLERK_PUBLISHABLE_KEY in wrangler.jsonc vars.");
+    return <div>Error: Clerk publishable key is not configured</div>;
+  }
+
   return (
     <ClerkProvider 
       loaderData={loaderData}
-      publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+      publishableKey={publishableKey}
     >
       <Header />
       <main className="container mx-auto px-4 py-8">
