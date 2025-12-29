@@ -1,5 +1,7 @@
 import type { Context, Next } from "hono";
 import { PrismaClient } from "../../../app/generated/prisma/client.js";
+import { withAccelerate } from "@prisma/extension-accelerate";
+
 import { PrismaPg } from "@prisma/adapter-pg";
 import { env } from "hono/adapter";
 import type { AppContext } from "../types/context.js";
@@ -40,18 +42,29 @@ function getDatabaseUrl(c?: Context<AppContext>): string {
 /**
  * Create Prisma client instance
  * Uses Prisma Accelerate URL if available, otherwise direct connection
+ * 
+ * For Cloudflare Workers (edge runtime), uses Accelerate extension when Accelerate URL is detected
+ * @see https://www.prisma.io/docs/accelerate/getting-started
  */
-function createPrismaClient(databaseUrl: string): PrismaClient {
-  // If using Prisma Accelerate, the URL will be the Accelerate connection string
-  // For Accelerate, we can use it directly without an adapter
-  // However, Prisma Client needs the connection string at initialization
-  // For Cloudflare Workers, we'll use the adapter approach for consistency
-  // Note: Accelerate works via HTTP, so technically no adapter is needed,
-  // but for simplicity and to ensure the connection string is passed correctly,
-  // we'll use the adapter for both cases in Cloudflare Workers environment
+function createPrismaClient(databaseUrl: string) {
+  // Check if using Prisma Accelerate (URL starts with "prisma://" or contains "accelerate.prisma-data.net")
+  const isAccelerate = databaseUrl.startsWith("prisma://") || 
+                       databaseUrl.includes("accelerate.prisma-data.net");
+  
+  if (isAccelerate) {
+    // For Prisma Accelerate in Cloudflare Workers (edge runtime)
+    // Use accelerateUrl option and extend with Accelerate extension
+    // This provides connection pooling and optional caching
+    // @see https://www.prisma.io/docs/accelerate/getting-started#24-extend-your-prisma-client-instance-with-the-accelerate-extension
+    const prisma = new PrismaClient({
+      accelerateUrl: databaseUrl,
+    }).$extends(withAccelerate());
+    
+    // Return extended client (type assertion needed as extended type differs from base PrismaClient)
+    return prisma as any;
+  }
   
   // Direct PostgreSQL connection - requires adapter for Cloudflare Workers
-  // For Accelerate, we can also use adapter (it will handle the HTTP connection)
   const adapter = new PrismaPg({
     connectionString: databaseUrl,
   });
@@ -62,14 +75,14 @@ function createPrismaClient(databaseUrl: string): PrismaClient {
 // Singleton Prisma client instance
 // For Cloudflare Workers, we'll create per-request instances
 // For Node.js, we'll reuse a single instance
-let prismaInstance: PrismaClient | null = null;
+let prismaInstance: any = null;
 
 /**
  * Get or create Prisma client instance
  * In Cloudflare Workers, creates per-request instance
  * In Node.js, reuses singleton
  */
-function getPrismaClient(c?: Context<AppContext>): PrismaClient {
+function getPrismaClient(c?: Context<AppContext>): any {
   // For Cloudflare Workers, create per-request instance
   if (c) {
     const databaseUrl = getDatabaseUrl(c);
@@ -95,7 +108,8 @@ function getPrismaClient(c?: Context<AppContext>): PrismaClient {
 function withPrisma(c: Context<AppContext>, next: Next) {
   if (!c.get("prisma")) {
     const prisma = getPrismaClient(c);
-    c.set("prisma", prisma);
+    // Type assertion needed because extended Prisma client type doesn't match base PrismaClient
+    c.set("prisma" as any, prisma);
   }
   return next();
 }

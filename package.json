@@ -29,6 +29,7 @@
     "@posthog/react": "^1.5.2",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.2.0",
+    "@prisma/extension-accelerate": "^3.0.1",
     "@react-router/cloudflare": "^7.11.0",
     "@react-router/fs-routes": "^7.11.0",
     "@react-router/node": "7.11.0",
@@ -85,11 +86,11 @@
     "format": "prettier",
     "check": "prettier --write . && eslint --fix",
     "post-cta-init": "npx create-db@latest",
-    "db:generate": "dotenv -e .env.local -- prisma generate",
-    "db:push": "dotenv -e .env.local -- prisma db push",
-    "db:migrate": "dotenv -e .env.local -- prisma migrate dev",
-    "db:studio": "dotenv -e .env.local -- prisma studio",
-    "db:seed": "dotenv -e .env.local -- prisma db seed",
+    "db:generate": "dotenv -e .dev.vars -- prisma generate",
+    "db:push": "dotenv -e .dev.vars -- prisma db push",
+    "db:migrate": "dotenv -e .dev.vars -- prisma migrate dev",
+    "db:studio": "dotenv -e .dev.vars -- prisma studio",
+    "db:seed": "dotenv -e .dev.vars -- prisma db seed",
     "docs:generate": "npx @rcmade/hono-docs generate --config ./hono-docs.ts"
   }
 }
