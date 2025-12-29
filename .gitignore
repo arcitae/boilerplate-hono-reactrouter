@@ -204,9 +204,6 @@ dist
 
 /src/generated/prisma
 
-### Generated API Documentation ###
-/openapi/openapi.json
-
 
 ### IDEs ###
 .idea/

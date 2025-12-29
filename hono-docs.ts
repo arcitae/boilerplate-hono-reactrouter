@@ -32,7 +32,7 @@ export default defineConfig({
     {
       name: "Health Routes",
       apiPrefix: "/health",
-      appTypePath: "app/backend/routes/health.ts",
+      appTypePath: "app/server/routes/health.ts",
       api: [
         {
           api: "/",
@@ -61,7 +61,7 @@ export default defineConfig({
     {
       name: "User Routes",
       apiPrefix: "/users",
-      appTypePath: "app/backend/routes/users.ts",
+      appTypePath: "app/server/routes/users.ts",
       api: [
         {
           api: "/",
@@ -103,7 +103,7 @@ export default defineConfig({
     {
       name: "Post Routes",
       apiPrefix: "/posts",
-      appTypePath: "app/backend/routes/posts.ts",
+      appTypePath: "app/server/routes/posts.ts",
       api: [
         {
           api: "/",

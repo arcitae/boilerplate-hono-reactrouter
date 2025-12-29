@@ -23,7 +23,7 @@
     "paths": {
       "~/*": ["./app/*"],
       "@frontend/*": ["app/client/*"],
-      "@backend/*": ["./app/backend/*"],
+      "@backend/*": ["./app/server/*"],
       "@shared/*": ["./app/shared/*"]
     },
     "esModuleInterop": true,

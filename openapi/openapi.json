@@ -1,0 +1,1145 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Panya API",
+    "version": "1.0.0",
+    "description": "API documentation for Panya language learning platform",
+    "contact": {
+      "name": "API Support"
+    }
+  },
+  "servers": [
+    {
+      "url": "/api",
+      "description": "API Base URL"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Health Routes"
+    },
+    {
+      "name": "User Routes"
+    },
+    {
+      "name": "Post Routes"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "default": {
+            "description": "Default fallback response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string"
+                    },
+                    "service": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "timestamp",
+                    "service"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Returns the health status of the API",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "summary": "Readiness check",
+        "responses": {
+          "default": {
+            "description": "Default fallback response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string"
+                    },
+                    "database": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "timestamp",
+                    "database"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Checks if the service is ready to accept traffic (includes database check)",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/health/live": {
+      "get": {
+        "summary": "Liveness check",
+        "responses": {
+          "default": {
+            "description": "Default fallback response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "timestamp"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Checks if the service is alive",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/users": {
+      "get": {
+        "summary": "Get all users",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Default fallback response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "posts": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "title": {
+                                  "type": "string"
+                                },
+                                "content": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string"
+                                    }
+                                  ]
+                                },
+                                "published": {
+                                  "oneOf": [
+                                    {},
+                                    {}
+                                  ]
+                                },
+                                "authorId": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "title",
+                                "content",
+                                "published",
+                                "authorId"
+                              ]
+                            }
+                          },
+                          "id": {
+                            "type": "number"
+                          },
+                          "email": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "posts",
+                          "id",
+                          "email",
+                          "name"
+                        ]
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "page": {
+                          "type": "number"
+                        },
+                        "limit": {
+                          "type": "number"
+                        },
+                        "total": {
+                          "type": "number"
+                        },
+                        "totalPages": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "page",
+                        "limit",
+                        "total",
+                        "totalPages"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "pagination"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Retrieve a paginated list of users",
+        "tags": [
+          "Users"
+        ]
+      },
+      "post": {
+        "summary": "Create user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Status 201",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "posts": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "content": {
+                                "oneOf": [
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "published": {
+                                "oneOf": [
+                                  {},
+                                  {}
+                                ]
+                              },
+                              "authorId": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "title",
+                              "content",
+                              "published",
+                              "authorId"
+                            ]
+                          }
+                        },
+                        "id": {
+                          "type": "number"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "posts",
+                        "id",
+                        "email",
+                        "name"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Create a new user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "summary": "Auto-generated GET /{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Default fallback response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "posts": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "content": {
+                                "oneOf": [
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "published": {
+                                "oneOf": [
+                                  {},
+                                  {}
+                                ]
+                              },
+                              "authorId": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "title",
+                              "content",
+                              "published",
+                              "authorId"
+                            ]
+                          }
+                        },
+                        "id": {
+                          "type": "number"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "posts",
+                        "id",
+                        "email",
+                        "name"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Routes"
+        ]
+      },
+      "put": {
+        "summary": "Auto-generated PUT /{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "email": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Default fallback response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "posts": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "content": {
+                                "oneOf": [
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "published": {
+                                "oneOf": [
+                                  {},
+                                  {}
+                                ]
+                              },
+                              "authorId": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "title",
+                              "content",
+                              "published",
+                              "authorId"
+                            ]
+                          }
+                        },
+                        "id": {
+                          "type": "number"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "posts",
+                        "id",
+                        "email",
+                        "name"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Routes"
+        ]
+      },
+      "delete": {
+        "summary": "Auto-generated DELETE /{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Routes"
+        ]
+      }
+    },
+    "/posts": {
+      "get": {
+        "summary": "Get all posts",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Default fallback response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "author": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number"
+                              },
+                              "email": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "oneOf": [
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "email",
+                              "name"
+                            ]
+                          },
+                          "id": {
+                            "type": "number"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "content": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "published": {
+                            "oneOf": [
+                              {},
+                              {}
+                            ]
+                          },
+                          "authorId": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "author",
+                          "id",
+                          "title",
+                          "content",
+                          "published",
+                          "authorId"
+                        ]
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "page": {
+                          "type": "number"
+                        },
+                        "limit": {
+                          "type": "number"
+                        },
+                        "total": {
+                          "type": "number"
+                        },
+                        "totalPages": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "page",
+                        "limit",
+                        "total",
+                        "totalPages"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "pagination"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Retrieve a paginated list of posts",
+        "tags": [
+          "Posts"
+        ]
+      },
+      "post": {
+        "summary": "Create post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "authorId": {
+                    "type": "number"
+                  },
+                  "content": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "published": {
+                    "oneOf": [
+                      {},
+                      {}
+                    ]
+                  }
+                },
+                "required": [
+                  "title",
+                  "authorId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Status 201",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "author": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "number"
+                            },
+                            "email": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "oneOf": [
+                                {
+                                  "type": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "email",
+                            "name"
+                          ]
+                        },
+                        "id": {
+                          "type": "number"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "content": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "published": {
+                          "oneOf": [
+                            {},
+                            {}
+                          ]
+                        },
+                        "authorId": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "author",
+                        "id",
+                        "title",
+                        "content",
+                        "published",
+                        "authorId"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Create a new post",
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
+    "/posts/{id}": {
+      "get": {
+        "summary": "Auto-generated GET /{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Default fallback response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "author": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "number"
+                            },
+                            "email": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "oneOf": [
+                                {
+                                  "type": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "email",
+                            "name"
+                          ]
+                        },
+                        "id": {
+                          "type": "number"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "content": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "published": {
+                          "oneOf": [
+                            {},
+                            {}
+                          ]
+                        },
+                        "authorId": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "author",
+                        "id",
+                        "title",
+                        "content",
+                        "published",
+                        "authorId"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Post Routes"
+        ]
+      },
+      "put": {
+        "summary": "Auto-generated PUT /{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "content": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "published": {
+                    "oneOf": [
+                      {},
+                      {}
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Default fallback response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "author": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "number"
+                            },
+                            "email": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "oneOf": [
+                                {
+                                  "type": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "email",
+                            "name"
+                          ]
+                        },
+                        "id": {
+                          "type": "number"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "content": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "published": {
+                          "oneOf": [
+                            {},
+                            {}
+                          ]
+                        },
+                        "authorId": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "author",
+                        "id",
+                        "title",
+                        "content",
+                        "published",
+                        "authorId"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Post Routes"
+        ]
+      },
+      "delete": {
+        "summary": "Auto-generated DELETE /{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Post Routes"
+        ]
+      }
+    }
+  }
+}
