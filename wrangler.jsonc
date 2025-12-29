@@ -16,5 +16,9 @@
     "VITE_BACKEND_URL":"http://localhost:5173",
     "VITE_PUBLIC_POSTHOG_KEY":"phc_m9nT4Uuhc2XORxocYEZVxjowKAQRBtyom7VSnkJsfL3",
     "VITE_PUBLIC_POSTHOG_HOST":"https://us.i.posthog.com"
-  }
+  },
+  "placement": {
+    "mode": "smart"
+  },
+  "preview_urls": true
 }
