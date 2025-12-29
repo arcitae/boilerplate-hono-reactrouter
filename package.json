@@ -72,10 +72,10 @@
   },
   "scripts": {
     "build": "react-router build",
-    "typegen": "wrangler types --config app/client/workers/wrangler.jsonc --path worker-configuration-client.d.ts && wrangler types --config app/server/workers/wrangler.jsonc --path worker-configuration-server.d.ts",
+    "typegen": "wrangler types --config wrangler.jsonc --path worker-configuration.d.ts",
     "deploy": "npm run deploy:all",
     "dev": "react-router dev",
-    "dev:server": "wrangler dev --config app/server/workers/wrangler.jsonc --port 8787",
+    "dev:server": "wrangler dev --config wrangler.jsonc --port 8787",
     "dev:client": "react-router dev",
     "dev:all": "echo 'Run in separate terminals: npm run dev:server (Terminal 1) and npm run dev:client (Terminal 2)'",
     "preview": "npm run build && vite preview",

@@ -10,6 +10,6 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
-    "types": ["./worker-configuration-client.d.ts", "./worker-configuration-server.d.ts", "node"]
+    "types": ["./worker-configuration.d.ts", "node"]
   }
 }
