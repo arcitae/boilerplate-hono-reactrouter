@@ -43,25 +43,14 @@ export default defineConfig(() => {
       // BACKEND_URL will be available as import.meta.env.VITE_BACKEND_URL
       // Set this in .env.local or wrangler.frontend.toml
     },
-    // Ensure backend code is not included in client bundle
+    // Note: We don't mark backend as external here because:
+    // 1. The worker build (SSR) needs backend code bundled
+    // 2. The client build naturally won't include it if client code doesn't import it
+    // 3. If needed, we can add client-specific exclusions later
     build: {
       rollupOptions: {
-        external: (id) => {
-          // Exclude backend code from client bundle
-          if (
-            id.includes("/app/server/") ||
-            id.startsWith("@backend/") ||
-            id.includes("\\app\\server\\") // Windows paths
-          ) {
-            return true;
-          }
-          return false;
-        },
+        // No external dependencies - let Vite handle code splitting naturally
       },
-    },
-    // Optimize dependencies to exclude backend
-    optimizeDeps: {
-      exclude: ["@backend/*"],
     },
   };
 });

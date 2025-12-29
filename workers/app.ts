@@ -13,9 +13,16 @@ import { createRequestHandler } from "@react-router/cloudflare";
 import { RouterContextProvider } from "react-router";
 import { cloudflareContext } from "../app/context";
 
-const app = await import("../app/server/index.js");
+// Import Hono app using the @backend alias
+// This should be resolved correctly by Vite's alias system
+// @ts-ignore - TypeScript doesn't resolve the alias, but Vite does
+import honoApp from "@backend/index.js";
 
-const apiRequestHandler = app.default.fetch;
+// Hono apps in Cloudflare Workers have a .fetch method
+// They accept (request, env, executionContext) and return Response
+const apiRequestHandler = (request: Request, env: any, ctx: ExecutionContext) => {
+  return honoApp.fetch(request, env, ctx);
+};
 
 const requestHandler = createRequestHandler({
   build: () => import("virtual:react-router/server-build"),
