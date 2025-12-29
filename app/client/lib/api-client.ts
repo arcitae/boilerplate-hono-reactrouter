@@ -25,7 +25,7 @@ function getBaseUrl(): string {
   }
   
   // Fallback for local development
-  return "http://localhost:8787";
+  return "http://localhost:5173";
 }
 
 /**

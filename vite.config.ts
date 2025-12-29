@@ -13,7 +13,7 @@ export default defineConfig(() => {
       // The plugin is needed for production builds to Cloudflare Workers
       cloudflare({ 
         viteEnvironment: { name: "ssr" },
-        configPath: "./app/client/workers/wrangler.jsonc",
+        configPath: "./wrangler.jsonc",
       }),
       tailwindcss(),
       reactRouter(), // reactRouter() already includes React support, no need for viteReact()
@@ -31,12 +31,12 @@ export default defineConfig(() => {
         overlay: true,
       },
       // Proxy API requests to backend worker in development
-      proxy: {
-        "/api": {
-          target: "http://localhost:8787",
-          changeOrigin: true,
-        },
-      },
+      // proxy: {
+      //   "/api": {
+      //     target: "http://localhost:8787",
+      //     changeOrigin: true,
+      //   },
+      // },
     },
     // Define environment variables for client-side
     define: {

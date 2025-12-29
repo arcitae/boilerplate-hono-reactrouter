@@ -206,3 +206,7 @@ dist
 
 ### Generated API Documentation ###
 /openapi/openapi.json
+
+
+### IDEs ###
+.idea/
