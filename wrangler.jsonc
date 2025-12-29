@@ -10,16 +10,11 @@
   "observability": {
     "enabled": true
   },
-  // "vars": {
-  //   "NODE_ENV": "production"
-  // },
-  // "env": {
-  //   "local": {
-  //     "name": "boilerplate-server-staging",
-  //     "route": {
-  //       "pattern": "staging.boilerplate-server.com/*",
-  //       "zone_name": "boilerplate-server.com"
-  //     },
-  //   }
-  // }
+  "vars": {
+    "NODE_ENV": "production",
+    "VITE_CLERK_PUBLISHABLE_KEY":"pk_test_c3VyZS1waGVhc2FudC02MS5jbGVyay5hY2NvdW50cy5kZXYk",
+    "VITE_BACKEND_URL":"http://localhost:5173",
+    "VITE_PUBLIC_POSTHOG_KEY":"phc_m9nT4Uuhc2XORxocYEZVxjowKAQRBtyom7VSnkJsfL3",
+    "VITE_PUBLIC_POSTHOG_HOST":"https://us.i.posthog.com"
+  }
 }
