@@ -1,117 +1,163 @@
-# Separate Workers Setup Summary
+# Architecture: Single Worker Setup
 
-## What Was Changed
+## Current Architecture
 
-The application has been split into two separate Cloudflare Workers:
+The application uses a **single Cloudflare Worker** that handles both:
+- **Frontend routes** (React Router) - All non-API routes
+- **Backend API routes** (Hono) - All `/api/*` routes
 
-1. **Backend Worker** (`workers/backend.ts`) - Handles all API routes
-2. **Frontend Worker** (`workers/frontend.ts`) - Handles all React Router routes
+## Why Single Worker?
 
-## New Files Created
+### Benefits
 
-### Worker Entry Points
-- `workers/backend.ts` - Backend worker entry point (exports Hono app)
-- `workers/frontend.ts` - Frontend worker entry point (React Router handler)
+1. **Zero Latency API Calls**
+   - Server-side API calls (in React Router loaders) use direct function calls
+   - No HTTP overhead - instant responses
+   - Better performance than separate workers
 
-### Configuration Files
-- `wrangler.backend.jsonc` - Backend worker configuration
-- `wrangler.frontend.jsonc` - Frontend worker configuration
+2. **Simplified Configuration**
+   - Single deployment
+   - Shared environment variables
+   - No CORS configuration needed
+   - No `BACKEND_URL` needed
 
-### Documentation
-- `DEPLOYMENT_GUIDE.md` - Complete deployment guide
-- `SEPARATE_WORKERS_SETUP.md` - This file
+3. **Cost Effective**
+   - One worker instead of two
+   - Lower complexity
+   - Easier to manage
 
-## Modified Files
+4. **Better Performance**
+   - No network latency between frontend and backend
+   - Shared memory and context
+   - Optimized for serverless
+
+### Trade-offs
+
+- **Scaling**: Both frontend and backend scale together (usually fine for most apps)
+- **Isolation**: Less isolation between frontend and backend (usually not an issue)
+
+## How It Works
+
+### Worker Entry Point
+
+`workers/app.ts` handles routing:
+
+```typescript
+export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+    
+    // API routes → Hono app
+    if (url.pathname.startsWith('/api/')) {
+      return honoApp.fetch(request, env, ctx);
+    }
+    
+    // All other routes → React Router
+    return requestHandler(eventContext);
+  }
+}
+```
 
 ### API Client
-- `app/frontend/lib/api-client.ts`
-  - Updated to use `BACKEND_URL` from environment variables
-  - Removed direct backend app import (no longer available in separate workers)
-  - Now makes HTTP requests to backend worker URL
 
-### Environment Types
-- `app/backend/types/env.ts`
-  - Added `BACKEND_URL` to `Env` type
+The API client (`app/client/lib/api-client.ts`) automatically detects the environment:
 
-### Package Scripts
-- `package.json`
-  - Added `deploy:backend` - Deploy backend worker only
-  - Added `deploy:frontend` - Build and deploy frontend worker only
-  - Added `deploy:all` - Deploy both workers
+- **Server-side (loaders)**: Makes direct function calls to Hono app (zero latency)
+- **Client-side (browser)**: Makes HTTP requests to same origin
 
-## Key Changes
+```typescript
+// Server-side: Direct call (zero latency)
+const client = apiClient(args.context, args.request);
+const res = await client.api.posts.$get();
 
-### 1. API Client Architecture
+// Client-side: HTTP request (same origin)
+const client = apiClient();
+const res = await client.api.posts.$get();
+```
 
-**Before** (Single Worker):
-- Server-side: Direct backend app fetch (no HTTP)
-- Client-side: HTTP requests to same origin
+## File Structure
 
-**After** (Separate Workers):
-- Server-side: HTTP requests to `BACKEND_URL`
-- Client-side: HTTP requests to `BACKEND_URL`
+```
+workers/
+  └── app.ts              # Single worker entry point
 
-### 2. Environment Variables
+app/
+  ├── client/             # Frontend (React Router)
+  │   ├── routes/         # React Router routes
+  │   └── lib/
+  │       └── api-client.ts  # API client (handles direct calls + HTTP)
+  └── server/             # Backend (Hono)
+      ├── routes/         # API routes
+      └── index.ts        # Hono app export
 
-**Backend Worker** needs:
-- `FRONTEND_URL` - For CORS configuration
-- `DATABASE_URL` - PostgreSQL connection
-- `CLERK_SECRET_KEY` - Authentication
+wrangler.jsonc            # Single worker configuration
+```
+
+## Environment Variables
+
+All environment variables are shared between frontend and backend:
+
+**Secrets** (set via `wrangler secret put`):
+- `DATABASE_URL` - Database connection
+- `CLERK_SECRET_KEY` - Backend authentication
+- `CLERK_PUBLISHABLE_KEY` - Frontend authentication
 - Other service API keys
 
-**Frontend Worker** needs:
-- `BACKEND_URL` - Backend worker URL (for API calls)
-- `CLERK_PUBLISHABLE_KEY` - Authentication
-- `POSTHOG_KEY` - Analytics (optional)
+**Vars** (set in `wrangler.jsonc`):
+- `NODE_ENV` - Environment
+- `VITE_CLERK_PUBLISHABLE_KEY` - Clerk publishable key
+- `VITE_PUBLIC_POSTHOG_KEY` - PostHog analytics (optional)
 
-### 3. CORS Configuration
+**Note:** `VITE_BACKEND_URL` is **not needed** - API calls use the same origin.
 
-Backend CORS is already configured to use `FRONTEND_URL` from environment:
-- Located in `app/backend/middleware/config.ts`
-- Automatically allows requests from frontend worker URL
-- Credentials enabled for authenticated requests
+## Deployment
 
-## Deployment Workflow
+Single deployment command:
 
-1. **Deploy Backend First**:
-   ```bash
-   npm run deploy:backend
-   ```
-   - Get the backend worker URL: `https://panya-backend.<subdomain>.workers.dev`
+```bash
+npm run build
+wrangler deploy
+```
 
-2. **Update Frontend Config**:
-   - Set `BACKEND_URL` in `wrangler.frontend.jsonc` to backend worker URL
+Or:
 
-3. **Deploy Frontend**:
-   ```bash
-   npm run deploy:frontend
-   ```
+```bash
+npm run deploy
+```
 
-4. **Update Backend CORS** (if needed):
-   - Set `FRONTEND_URL` secret in backend to frontend worker URL
+## Migration from Separate Workers
 
-## Development
+If you previously used separate workers:
 
-For local development, you can still use the single worker setup:
-- Keep `workers/app.ts` and `wrangler.jsonc` for local dev
-- Or run backend and frontend separately with different ports
+1. ✅ **Already migrated** - Current setup uses single worker
+2. ✅ **API client** - Automatically handles direct calls vs HTTP
+3. ✅ **Environment variables** - All in one place
+4. ✅ **No CORS** - Same origin, no CORS needed
 
-## Migration Notes
+## Performance Characteristics
 
-- The original `workers/app.ts` is still available for single-worker deployments
-- Both deployment methods are supported
-- Choose based on your needs:
-  - **Single Worker**: Simpler, single deployment, same origin
-  - **Separate Workers**: Independent scaling, separate domains, better isolation
+### Server-Side API Calls (Loaders)
 
-## Next Steps
+- **Latency**: ~0ms (direct function call)
+- **Overhead**: Minimal (no serialization)
+- **Type Safety**: Full TypeScript support
 
-1. Review `DEPLOYMENT_GUIDE.md` for detailed deployment instructions
-2. Set up environment variables (secrets) for both workers
-3. Deploy backend worker first
-4. Update frontend config with backend URL
-5. Deploy frontend worker
-6. Test both workers
-7. Configure custom domains (optional)
+### Client-Side API Calls (Browser)
 
+- **Latency**: Network latency (same origin, very fast)
+- **Overhead**: Normal HTTP overhead
+- **Type Safety**: Full TypeScript support via Hono client
 
+## Best Practices
+
+1. **Use loaders for data fetching** - Get zero-latency API calls
+2. **Keep API routes in `/api/*`** - Clear separation
+3. **Share environment variables** - Single source of truth
+4. **Use type-safe API client** - Full TypeScript support
+
+## Notes
+
+- Single worker is the recommended approach for most applications
+- Provides best performance with zero-latency server-side API calls
+- Simplifies deployment and configuration
+- No need for separate worker setup unless you have specific scaling requirements

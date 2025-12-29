@@ -1,9 +1,11 @@
 /**
- * Frontend Cloudflare Worker Entry Point
- * Handles all frontend routes via React Router
+ * Single Cloudflare Worker Entry Point
+ * Handles both frontend routes (React Router) and backend API routes (Hono)
  * 
- * This worker is completely separate from the backend worker.
- * API calls are made to the backend worker via HTTP.
+ * This single worker provides:
+ * - Zero-latency API calls from server-side loaders (direct function calls)
+ * - Same-origin requests (no CORS needed)
+ * - Simplified deployment and configuration
  * 
  * Uses @react-router/cloudflare's createRequestHandler which properly handles
  * middleware and RouterContextProvider for Cloudflare Workers.

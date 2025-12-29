@@ -39,6 +39,50 @@ A perfect starting point for building interactive, styled, and edge-deployed SPA
   - Vite plugin auto-bundles frontend and backend together
   - Deployed worldwide on Cloudflare’s edge network
 
+## Quick Start
+
+### Local Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start dev server (React Router dev server - recommended)
+npm run dev
+
+# Or test Cloudflare Workers environment
+npm run dev:server
+```
+
+### Deployment
+
+```bash
+# Build and deploy to Cloudflare Workers
+npm run deploy
+```
+
+See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) for detailed deployment instructions.
+
+## Architecture
+
+This template uses a **single Cloudflare Worker** that handles both:
+- **Frontend routes** (React Router) - All non-API routes
+- **Backend API routes** (Hono) - All `/api/*` routes
+
+**Benefits:**
+- ✅ Zero-latency API calls from server-side loaders (direct function calls)
+- ✅ Same-origin requests (no CORS needed)
+- ✅ Simplified deployment and configuration
+- ✅ Single worker to manage
+
+See [SEPARATE_WORKERS_SETUP.md](./SEPARATE_WORKERS_SETUP.md) for architecture details.
+
+## Documentation
+
+- [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) - Complete deployment guide
+- [LOCAL_DEVELOPMENT.md](./LOCAL_DEVELOPMENT.md) - Local development setup
+- [SEPARATE_WORKERS_SETUP.md](./SEPARATE_WORKERS_SETUP.md) - Architecture overview
+
 ## Resources
 
 - 🧩 [Hono on Cloudflare Workers](https://hono.dev/docs/getting-started/cloudflare-workers)
