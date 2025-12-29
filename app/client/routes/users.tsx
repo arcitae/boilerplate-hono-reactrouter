@@ -37,8 +37,8 @@ export async function loader(args: Route.LoaderArgs) {
     const limit = url.searchParams.get("limit") || "10";
 
     // Create request with authentication token
-    // The API client uses the backend app directly in server-side loaders
-    const client = apiClient();
+    // Pass the request to apiClient so it can use the same origin (same worker)
+    const client = apiClient(args.request);
     // Type assertion needed due to complex type inference
     const typedClient = client as any;
     const res = await typedClient.api.users.$get(
