@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "boilerplate",
+  "name": "boilerplate-hono-reactrouter",
   "main": "./workers/app.ts",
   "compatibility_date": "2025-11-17",
   "compatibility_flags": [
